@@ -8,7 +8,10 @@ API должен слушать тот же адрес, куда смотрит 
 
 ```
 API_PROXY_TARGET=http://127.0.0.1:8086
+VITE_PLAY_PUBLIC_URL=http://localhost:5175
 ```
+
+Кнопка «Открыть экран» выпускает host-токен и открывает `PLAY/tv?token=…` в новой вкладке; рядом QR той же ссылки для Smart TV.
 
 ```bash
 yarn install

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
-import { useState } from "react";
+import QRCode from "qrcode";
+import { useEffect, useState } from "react";
 
 import { canEditQuizzes, statusLabel, useSessionStore } from "@entities/session";
 import { getQuiz, issueHostToken, quizKeys, updateQuiz } from "@entities/quiz";
@@ -18,7 +19,8 @@ import { QuestionForm } from "@features/question-form";
 import { QuizForm, type QuizValues } from "@features/quiz-form";
 import { QuestionList } from "@widgets/question-list";
 import { errorMessage } from "@shared/api";
-import { Badge, Button, Input, Notice, Panel } from "@shared/ui";
+import { tvDeepLink } from "@shared/config/play";
+import { Badge, Button, Notice, Panel } from "@shared/ui";
 
 export function QuizEditorPage() {
   const { quizId } = useParams({ strict: false });
@@ -49,9 +51,23 @@ function QuizEditor({ quizId }: { quizId: string }) {
     },
   });
 
-  const token = useMutation({
+  const [screenURL, setScreenURL] = useState("");
+  const [screenQR, setScreenQR] = useState("");
+
+  const openScreen = useMutation({
     mutationFn: () => issueHostToken(quizId),
+    onSuccess: async (host) => {
+      const url = tvDeepLink(host.token);
+      setScreenURL(url);
+      setScreenQR(await QRCode.toDataURL(url, { margin: 1, width: 280, color: { dark: "#0c0a09", light: "#fafaf9" } }));
+      window.open(url, "_blank", "noopener,noreferrer");
+    },
   });
+
+  useEffect(() => {
+    setScreenURL("");
+    setScreenQR("");
+  }, [quizId]);
 
   const saveQuestion = useMutation({
     mutationFn: (body: QuestionInput) =>
@@ -135,21 +151,32 @@ function QuizEditor({ quizId }: { quizId: string }) {
       ) : null}
 
       {quiz.data?.status === "published" ? (
-        <Panel title="Токен ведущего">
-          <p className="mb-3 text-sm text-stone-600">Короткий ключ, чтобы открыть комнату на экране. Действует около двух минут.</p>
-          <Button tone="signal" disabled={token.isPending} onClick={() => token.mutate()}>
-            {token.isPending ? "Выпускаем…" : "Выпустить токен"}
-          </Button>
-          {token.isError ? <div className="mt-3"><Notice>{errorMessage(token.error)}</Notice></div> : null}
-          {token.data ? (
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-              <Input readOnly value={token.data.token} />
-              <Button
-                tone="ghost"
-                onClick={() => void navigator.clipboard.writeText(token.data?.token ?? "")}
-              >
-                Копировать
+        <Panel title="Эфир">
+          <p className="mb-3 text-sm text-stone-600">
+            Откроет экран зала в новой вкладке. Для Smart TV отсканируйте QR той же ссылкой — вводить токен не нужно.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button tone="signal" disabled={openScreen.isPending} onClick={() => openScreen.mutate()}>
+              {openScreen.isPending ? "Открываем…" : "Открыть экран"}
+            </Button>
+            {screenURL ? (
+              <Button tone="ghost" onClick={() => void navigator.clipboard.writeText(screenURL)}>
+                Копировать ссылку
               </Button>
+            ) : null}
+          </div>
+          {openScreen.isError ? (
+            <div className="mt-3">
+              <Notice>{errorMessage(openScreen.error)}</Notice>
+            </div>
+          ) : null}
+          {screenQR ? (
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-start">
+              <img alt="QR для открытия экрана на телевизоре" className="h-40 w-40 rounded-2xl bg-white p-2" src={screenQR} />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-700">Для телевизора</p>
+                <p className="mt-1 break-all text-sm text-stone-600">{screenURL}</p>
+              </div>
             </div>
           ) : null}
         </Panel>
