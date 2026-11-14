@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { RegisterForm } from "@features/register";
 import { AuthFrame } from "@widgets/auth-frame";
+import { LegalLinks } from "@widgets/legal-links";
 
 export function RegisterPage() {
   const [sent, setSent] = useState(false);
@@ -23,6 +24,7 @@ export function RegisterPage() {
           Войти
         </Link>
       </p>
+      <LegalLinks className="mt-6" />
     </AuthFrame>
   );
 }

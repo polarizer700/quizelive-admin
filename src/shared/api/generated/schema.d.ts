@@ -347,6 +347,7 @@ export interface components {
             text: string;
             time_limit_sec: number;
             points: number;
+            image_url?: string;
             options: components["schemas"]["AnswerOption"][];
             text_answers: string[];
         };

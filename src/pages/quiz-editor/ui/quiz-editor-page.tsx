@@ -8,10 +8,12 @@ import { getQuiz, issueHostToken, quizKeys, updateQuiz } from "@entities/quiz";
 import {
   createQuestion,
   deleteQuestion,
+  deleteQuestionImage,
   listQuestions,
   questionKeys,
   reorderQuestions,
   updateQuestion,
+  uploadQuestionImage,
   type Question,
   type QuestionInput,
 } from "@entities/question";
@@ -217,6 +219,22 @@ function QuizEditor({ quizId }: { quizId: string }) {
               onDelete={
                 selected !== "new" && current
                   ? () => removeQuestion.mutateAsync(current.id)
+                  : undefined
+              }
+              onUploadImage={
+                selected !== "new" && current
+                  ? async (file) => {
+                      await uploadQuestionImage(quizId, current.id, file);
+                      await queryClient.invalidateQueries({ queryKey: questionKeys.list(quizId) });
+                    }
+                  : undefined
+              }
+              onDeleteImage={
+                selected !== "new" && current
+                  ? async () => {
+                      await deleteQuestionImage(quizId, current.id);
+                      await queryClient.invalidateQueries({ queryKey: questionKeys.list(quizId) });
+                    }
                   : undefined
               }
             />

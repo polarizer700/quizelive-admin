@@ -54,12 +54,17 @@ export function QuestionForm({
   question,
   onSubmit,
   onDelete,
+  onUploadImage,
+  onDeleteImage,
 }: {
   question: Question | null;
   onSubmit: (body: QuestionInput) => Promise<void>;
   onDelete?: () => Promise<void>;
+  onUploadImage?: (file: File) => Promise<void>;
+  onDeleteImage?: () => Promise<void>;
 }) {
   const [formError, setFormError] = useState("");
+  const [imageBusy, setImageBusy] = useState(false);
   const form = useForm<QuestionValues>({
     resolver: zodResolver(questionSchema),
     defaultValues: question ? toValues(question) : emptyQuestion,
@@ -131,6 +136,47 @@ export function QuestionForm({
         <Label htmlFor="question-text">Вопрос</Label>
         <Textarea id="question-text" {...form.register("text")} />
         <FieldError>{form.formState.errors.text?.message}</FieldError>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="question-image">Картинка</Label>
+        {question?.image_url ? (
+          <img src={question.image_url} alt="" className="max-h-48 w-fit rounded-2xl object-contain" />
+        ) : (
+          <p className="text-sm text-stone-500">JPEG, PNG или WebP до 5 МБ. Сначала сохраните вопрос.</p>
+        )}
+        {onUploadImage && question ? (
+          <div className="flex flex-wrap gap-2">
+            <Input
+              id="question-image"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              disabled={imageBusy}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.target.value = "";
+                if (!file) return;
+                setImageBusy(true);
+                void onUploadImage(file)
+                  .catch((error) => setFormError(error instanceof Error ? error.message : "Не удалось загрузить картинку"))
+                  .finally(() => setImageBusy(false));
+              }}
+            />
+            {question.image_url && onDeleteImage ? (
+              <Button
+                tone="ghost"
+                disabled={imageBusy}
+                onClick={() => {
+                  setImageBusy(true);
+                  void onDeleteImage()
+                    .catch((error) => setFormError(error instanceof Error ? error.message : "Не удалось удалить картинку"))
+                    .finally(() => setImageBusy(false));
+                }}
+              >
+                Убрать картинку
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>

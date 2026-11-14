@@ -4,6 +4,7 @@ import { LogOut } from "lucide-react";
 
 import { canManageUsers, logout, roleLabel, useSessionStore } from "@entities/session";
 import { Button } from "@shared/ui";
+import { LegalLinks } from "@widgets/legal-links";
 
 export function AppShell() {
   const user = useSessionStore((state) => state.user);
@@ -51,8 +52,11 @@ export function AppShell() {
           </Button>
         </div>
       </aside>
-      <main className="px-5 py-8 md:px-10">
-        <Outlet />
+      <main className="flex min-h-screen flex-col px-5 py-8 md:px-10">
+        <div className="flex-1">
+          <Outlet />
+        </div>
+        <LegalLinks className="mt-10 border-t border-stone-200 pt-4" />
       </main>
     </div>
   );
