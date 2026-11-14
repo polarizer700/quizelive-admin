@@ -16,6 +16,7 @@ function greeting() {
 
 function pageContext(pathname: string) {
   if (pathname.startsWith("/users")) return { title: "Команда", hint: "Доступ и роли студии" };
+  if (pathname === "/quizzes/new") return { title: "Новая викторина", hint: "Карточка, затем вопросы" };
   if (pathname.startsWith("/quizzes/") && pathname !== "/quizzes") {
     return { title: "Редактор", hint: "Карточка, вопросы и эфир" };
   }

@@ -1,10 +1,11 @@
 import { createRootRoute, createRoute, createRouter, Outlet, redirect } from "@tanstack/react-router";
 
-import { canManageUsers, useSessionStore } from "@entities/session";
+import { canEditQuizzes, canManageUsers, useSessionStore } from "@entities/session";
 import { ForgotPasswordPage } from "@pages/forgot-password";
 import { LoginPage } from "@pages/login";
 import { RegisterPage } from "@pages/register";
 import { ResetPasswordPage } from "@pages/reset-password";
+import { QuizCreatePage } from "@pages/quiz-create";
 import { QuizEditorPage } from "@pages/quiz-editor";
 import { QuizzesPage } from "@pages/quizzes";
 import { UsersPage } from "@pages/users";
@@ -77,6 +78,15 @@ const quizzesRoute = createRoute({
   component: QuizzesPage,
 });
 
+const quizCreateRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "quizzes/new",
+  beforeLoad: () => {
+    if (!canEditQuizzes(useSessionStore.getState().user?.role)) throw redirect({ to: "/quizzes" });
+  },
+  component: QuizCreatePage,
+});
+
 const quizRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "quizzes/$quizId",
@@ -99,7 +109,7 @@ const routeTree = rootRoute.addChildren([
   resetPasswordRoute,
   registerRoute,
   verifyRoute,
-  appRoute.addChildren([quizzesRoute, quizRoute, usersRoute]),
+  appRoute.addChildren([quizzesRoute, quizCreateRoute, quizRoute, usersRoute]),
 ]);
 
 export const router = createRouter({

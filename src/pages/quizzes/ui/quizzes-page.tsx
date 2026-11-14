@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { FileText, Plus, Radio, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { canEditQuizzes, useSessionStore } from "@entities/session";
-import { createQuiz, deleteQuiz, listQuizzes, quizKeys, type Quiz } from "@entities/quiz";
-import { QuizForm, type QuizValues } from "@features/quiz-form";
+import { deleteQuiz, listQuizzes, quizKeys, type Quiz } from "@entities/quiz";
 import { QuizTable } from "@widgets/quiz-table";
 import { errorMessage } from "@shared/api";
 import { Button, Notice, PageHeader, Panel, StatCard, StatusDonut, TrendArea } from "@shared/ui";
@@ -41,23 +41,12 @@ export function QuizzesPage() {
   const role = useSessionStore((state) => state.user?.role);
   const canEdit = canEditQuizzes(role);
   const [offset, setOffset] = useState(0);
-  const [creating, setCreating] = useState(false);
   const [actionError, setActionError] = useState("");
   const queryClient = useQueryClient();
   const query = { limit, offset };
   const quizzes = useQuery({
     queryKey: quizKeys.list(query),
     queryFn: () => listQuizzes(query),
-  });
-
-  const create = useMutation({
-    mutationFn: (values: QuizValues) =>
-      createQuiz({ title: values.title.trim(), description: values.description.trim() }),
-    onSuccess: async () => {
-      setCreating(false);
-      setActionError("");
-      await queryClient.invalidateQueries({ queryKey: quizKeys.all });
-    },
   });
 
   const remove = useMutation({
@@ -87,16 +76,13 @@ export function QuizzesPage() {
         description="Готовьте вопросы, публикуйте пакет и открывайте экран в зале."
         action={
           canEdit ? (
-            <Button tone={creating ? "ghost" : "signal"} onClick={() => setCreating((value) => !value)}>
-              {creating ? (
-                "Закрыть"
-              ) : (
-                <>
-                  <Plus size={16} />
-                  Новая викторина
-                </>
-              )}
-            </Button>
+            <Link
+              to="/quizzes/new"
+              className="inline-flex items-center gap-2 rounded-2xl bg-orange-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-orange-600/20 transition hover:-translate-y-0.5 hover:bg-orange-700"
+            >
+              <Plus size={16} />
+              Новая викторина
+            </Link>
           ) : null
         }
       />
@@ -156,17 +142,6 @@ export function QuizzesPage() {
 
       {actionError ? <Notice>{actionError}</Notice> : null}
       {quizzes.isError ? <Notice>{errorMessage(quizzes.error, "Не удалось загрузить викторины")}</Notice> : null}
-
-      {creating ? (
-        <Panel title="Новая викторина" delay={240}>
-          <QuizForm
-            submitLabel="Создать викторину"
-            onSubmit={async (values) => {
-              await create.mutateAsync(values);
-            }}
-          />
-        </Panel>
-      ) : null}
 
       <Panel title="Все викторины" delay={280}>
         {quizzes.isLoading ? <p className="text-sm text-stone-500">Загрузка…</p> : null}
