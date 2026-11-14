@@ -25,6 +25,14 @@ body {
   min-height: 100vh;
 }
 
+button:not(:disabled),
+a[href],
+[role="button"]:not([aria-disabled="true"]),
+select:not(:disabled),
+summary {
+  cursor: pointer;
+}
+
 .glass-card,
 .glass-panel,
 .dash-card {
