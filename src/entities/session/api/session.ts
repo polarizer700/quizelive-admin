@@ -1,6 +1,6 @@
 import { api, bindSession, call } from "@shared/api";
 
-import { useSessionStore } from "../model/store";
+import { hasSessionHint, useSessionStore } from "../model/store";
 import type { User } from "../model/types";
 
 export async function register(body: { email: string; password: string }) {
@@ -58,6 +58,10 @@ export async function logout() {
 let bootstrapped: Promise<boolean> | null = null;
 
 export function bootstrapSession() {
+  if (!hasSessionHint()) {
+    bootstrapped ??= Promise.resolve(false);
+    return bootstrapped;
+  }
   bootstrapped ??= refreshSession();
   return bootstrapped;
 }

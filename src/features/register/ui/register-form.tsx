@@ -25,10 +25,18 @@ export function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
       onSuccess();
     } catch (error) {
       if (error instanceof ApiError && error.message === "email already exists") {
-        setFormError("Эта почта уже зарегистрирована");
+        setFormError("Эта почта уже зарегистрирована. Если письмо не пришло — войдите: мы вышлем ссылку снова.");
         return;
       }
-      setFormError(error instanceof ApiError ? error.message : "Не удалось создать аккаунт");
+      if (error instanceof ApiError && error.status === 429) {
+        setFormError("Слишком много попыток. Подождите минуту и попробуйте снова.");
+        return;
+      }
+      setFormError(
+        error instanceof ApiError
+          ? error.message
+          : "Не удалось создать аккаунт. Проверьте интернет и попробуйте ещё раз.",
+      );
     }
   }
 
