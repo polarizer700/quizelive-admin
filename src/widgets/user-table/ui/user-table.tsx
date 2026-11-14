@@ -85,7 +85,10 @@ export function UserTable({
         </thead>
         <tbody>
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="border-t border-stone-100">
+            <tr
+              key={row.id}
+              className="border-t border-stone-200/50 transition hover:bg-white/50"
+            >
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id} className="px-2 py-3 align-middle">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

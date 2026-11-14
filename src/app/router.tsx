@@ -1,8 +1,10 @@
 import { createRootRoute, createRoute, createRouter, Outlet, redirect } from "@tanstack/react-router";
 
 import { canManageUsers, useSessionStore } from "@entities/session";
+import { ForgotPasswordPage } from "@pages/forgot-password";
 import { LoginPage } from "@pages/login";
 import { RegisterPage } from "@pages/register";
+import { ResetPasswordPage } from "@pages/reset-password";
 import { QuizEditorPage } from "@pages/quiz-editor";
 import { QuizzesPage } from "@pages/quizzes";
 import { UsersPage } from "@pages/users";
@@ -45,6 +47,21 @@ const loginRoute = createRoute({
   component: LoginPage,
 });
 
+const forgotPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/forgot-password",
+  beforeLoad: () => {
+    if (useSessionStore.getState().accessToken) throw redirect({ to: "/quizzes" });
+  },
+  component: ForgotPasswordPage,
+});
+
+const resetPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/reset-password",
+  component: ResetPasswordPage,
+});
+
 const appRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "app",
@@ -78,6 +95,8 @@ const usersRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
+  forgotPasswordRoute,
+  resetPasswordRoute,
   registerRoute,
   verifyRoute,
   appRoute.addChildren([quizzesRoute, quizRoute, usersRoute]),

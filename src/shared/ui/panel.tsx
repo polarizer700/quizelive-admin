@@ -1,23 +1,37 @@
+import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
+
+import { cn } from "@shared/lib/cn";
 
 export function Panel({
   title,
   action,
   children,
+  className,
+  delay = 0,
 }: {
   title?: string;
   action?: ReactNode;
   children: ReactNode;
+  className?: string;
+  delay?: number;
 }) {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-stone-200/80">
+    <motion.section
+      className={cn("glass-panel rounded-[1.6rem] p-5", className)}
+      initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: delay / 1000, ease: [0.22, 1, 0.36, 1] }}
+    >
       {title || action ? (
         <div className="mb-4 flex items-center justify-between gap-3">
-          {title ? <h2 className="font-serif text-2xl text-stone-950">{title}</h2> : <span />}
+          {title ? <h2 className="text-xl font-semibold tracking-tight text-stone-950">{title}</h2> : <span />}
           {action}
         </div>
       ) : null}
       {children}
-    </section>
+    </motion.section>
   );
 }

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import { roleLabel } from "@entities/session";
 import { ApiError } from "@shared/api";
-import { Button, FieldError, Input, Label, Notice, Select } from "@shared/ui";
+import { Button, FieldError, Input, Label, Notice, PasswordHints, Select } from "@shared/ui";
 
 import { userSchema, type UserValues } from "../model/schema";
 
@@ -13,7 +13,9 @@ export function UserForm({ onSubmit }: { onSubmit: (values: UserValues) => Promi
   const form = useForm<UserValues>({
     resolver: zodResolver(userSchema),
     defaultValues: { email: "", password: "", role: "editor" },
+    mode: "onChange",
   });
+  const password = form.watch("password");
 
   async function submit(values: UserValues) {
     setFormError("");
@@ -47,6 +49,7 @@ export function UserForm({ onSubmit }: { onSubmit: (values: UserValues) => Promi
       <div>
         <Label htmlFor="user-password">Пароль</Label>
         <Input id="user-password" type="password" autoComplete="new-password" {...form.register("password")} />
+        <PasswordHints password={password} />
         <FieldError>{form.formState.errors.password?.message}</FieldError>
       </div>
       <div>

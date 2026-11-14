@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
+import { HelpCircle, Timer } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import QRCode from "qrcode";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { canEditQuizzes, statusLabel, useSessionStore } from "@entities/session";
 import { getQuiz, issueHostToken, quizKeys, updateQuiz } from "@entities/quiz";
@@ -22,7 +24,7 @@ import { QuizForm, type QuizValues } from "@features/quiz-form";
 import { QuestionList } from "@widgets/question-list";
 import { errorMessage } from "@shared/api";
 import { tvDeepLink } from "@shared/config/play";
-import { Badge, Button, Notice, Panel } from "@shared/ui";
+import { Badge, Button, Notice, Panel, StatCard, TrendArea } from "@shared/ui";
 
 export function QuizEditorPage() {
   const { quizId } = useParams({ strict: false });
@@ -116,24 +118,70 @@ function QuizEditor({ quizId }: { quizId: string }) {
   });
 
   const current = questions.data?.find((question) => question.id === selected) ?? null;
+  const reduceMotion = useReducedMotion();
+  const questionStats = useMemo(() => {
+    const list = questions.data ?? [];
+    const points = list.reduce((sum, question) => sum + (question.points ?? 0), 0);
+    const avgTime =
+      list.length === 0
+        ? 0
+        : Math.round(list.reduce((sum, question) => sum + (question.time_limit_sec ?? 0), 0) / list.length);
+    const trend = list.map((question, index) => ({
+      label: String(index + 1),
+      value: question.points ?? 0,
+      secondary: Math.round((question.time_limit_sec ?? 0) / 5),
+    }));
+    return { count: list.length, points, avgTime, trend };
+  }, [questions.data]);
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
-      <div>
-        <Link to="/quizzes" className="text-sm text-stone-500 hover:text-stone-800">
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Link to="/quizzes" className="text-sm text-stone-500 transition hover:text-stone-800">
           ← К викторинам
         </Link>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1 className="font-serif text-4xl">{quiz.data?.title ?? "Викторина"}</h1>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight text-stone-950 md:text-4xl">
+            {quiz.data?.title ?? "Викторина"}
+          </h1>
           {quiz.data ? <Badge tone={quiz.data.status}>{statusLabel[quiz.data.status]}</Badge> : null}
         </div>
+        <p className="mt-2 max-w-2xl text-sm text-stone-500">Карточка, вопросы и запуск экрана для зала.</p>
+      </motion.div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <StatCard
+          label="Вопросы"
+          value={questionStats.count}
+          hint="в пакете"
+          icon={<HelpCircle size={18} />}
+          delay={40}
+          sparkline={questionStats.trend.map((point) => point.value).concat([0, 1])}
+        />
+        <StatCard
+          label="Среднее время"
+          value={`${questionStats.avgTime} с`}
+          hint={`${questionStats.points} баллов суммарно`}
+          icon={<Timer size={18} />}
+          delay={100}
+        />
       </div>
+
+      {questionStats.trend.length > 0 ? (
+        <Panel title="Баллы по вопросам" delay={140}>
+          <TrendArea data={questionStats.trend} primaryLabel="Баллы" secondaryLabel="Время ÷ 5" />
+        </Panel>
+      ) : null}
 
       {actionError ? <Notice>{actionError}</Notice> : null}
       {quiz.isError ? <Notice>{errorMessage(quiz.error, "Викторина не найдена")}</Notice> : null}
 
       {quiz.data && canEdit ? (
-        <Panel title="Карточка">
+        <Panel title="Карточка" delay={180}>
           <QuizForm
             key={`${quiz.data.id}-${quiz.data.updated_at}`}
             includeStatus
@@ -147,13 +195,13 @@ function QuizEditor({ quizId }: { quizId: string }) {
       ) : null}
 
       {quiz.data && !canEdit ? (
-        <Panel title="Карточка">
+        <Panel title="Карточка" delay={180}>
           <p className="whitespace-pre-wrap text-sm text-stone-700">{quiz.data.description || "Без описания"}</p>
         </Panel>
       ) : null}
 
       {quiz.data?.status === "published" ? (
-        <Panel title="Эфир">
+        <Panel title="Эфир" delay={200}>
           <p className="mb-3 text-sm text-stone-600">
             Откроет экран зала в новой вкладке. Для Smart TV отсканируйте QR той же ссылкой — вводить токен не нужно.
           </p>
@@ -174,7 +222,11 @@ function QuizEditor({ quizId }: { quizId: string }) {
           ) : null}
           {screenQR ? (
             <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-start">
-              <img alt="QR для открытия экрана на телевизоре" className="h-40 w-40 rounded-2xl bg-white p-2" src={screenQR} />
+              <img
+                alt="QR для открытия экрана на телевизоре"
+                className="h-40 w-40 rounded-2xl border border-white/70 bg-white/80 p-2 backdrop-blur"
+                src={screenQR}
+              />
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-700">Для телевизора</p>
                 <p className="mt-1 break-all text-sm text-stone-600">{screenURL}</p>
@@ -187,6 +239,7 @@ function QuizEditor({ quizId }: { quizId: string }) {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <Panel
           title="Вопросы"
+          delay={240}
           action={
             canEdit ? (
               <Button tone="ghost" onClick={() => setSelected("new")}>
@@ -209,7 +262,7 @@ function QuizEditor({ quizId }: { quizId: string }) {
         </Panel>
 
         {canEdit && selected ? (
-          <Panel title={selected === "new" ? "Новый вопрос" : "Редактор вопроса"}>
+          <Panel title={selected === "new" ? "Новый вопрос" : "Редактор вопроса"} delay={280}>
             <QuestionForm
               key={selected === "new" ? "new" : current?.id ?? selected}
               question={selected === "new" ? null : current}

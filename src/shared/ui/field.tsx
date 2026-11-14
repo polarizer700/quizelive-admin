@@ -3,7 +3,7 @@ import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTML
 import { cn } from "@shared/lib/cn";
 
 const control =
-  "w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm outline-none ring-orange-700/30 placeholder:text-stone-400 focus:border-orange-700 focus:ring-4";
+  "w-full rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-sm outline-none ring-orange-600/25 placeholder:text-stone-400 backdrop-blur focus:border-orange-500 focus:ring-4";
 
 export function Label({ children, htmlFor }: { children: ReactNode; htmlFor?: string }) {
   return (

@@ -1,4 +1,13 @@
 export { canEditQuizzes, canManageUsers, questionTypeLabel, roleLabel, statusLabel } from "./model/access";
 export { useSessionStore } from "./model/store";
-export { bootstrapSession, login, logout, refreshSession, register, verifyEmail } from "./api/session";
+export {
+  bootstrapSession,
+  forgotPassword,
+  login,
+  logout,
+  refreshSession,
+  register,
+  resetPassword,
+  verifyEmail,
+} from "./api/session";
 export type { User, UserRole } from "./model/types";

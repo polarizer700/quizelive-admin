@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -22,7 +23,7 @@ export function LoginForm({ onSuccess }: { onSuccess: () => void }) {
       onSuccess();
     } catch (error) {
       if (error instanceof ApiError && error.slug === "EMAIL_NOT_VERIFIED") {
-        setFormError("Сначала подтвердите почту. Ссылка в письме.");
+        setFormError("Аккаунт ещё не подтверждён. Мы отправили новое письмо со ссылкой — откройте его и подтвердите почту.");
         return;
       }
       setFormError(error instanceof ApiError ? error.message : "Не удалось войти");
@@ -38,7 +39,12 @@ export function LoginForm({ onSuccess }: { onSuccess: () => void }) {
         <FieldError>{form.formState.errors.email?.message}</FieldError>
       </div>
       <div>
-        <Label htmlFor="password">Пароль</Label>
+        <div className="mb-1 flex items-center justify-between gap-3">
+          <Label htmlFor="password">Пароль</Label>
+          <Link to="/forgot-password" className="text-xs font-medium text-orange-700 hover:underline">
+            Забыли пароль?
+          </Link>
+        </div>
         <Input id="password" autoComplete="current-password" type="password" {...form.register("password")} />
         <FieldError>{form.formState.errors.password?.message}</FieldError>
       </div>

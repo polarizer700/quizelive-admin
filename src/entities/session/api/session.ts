@@ -7,6 +7,14 @@ export async function register(body: { email: string; password: string }) {
   await call(() => api.POST("/api/v1/auth/register", { body }), { auth: false });
 }
 
+export async function forgotPassword(email: string) {
+  await call(() => api.POST("/api/v1/auth/forgot-password", { body: { email } }), { auth: false });
+}
+
+export async function resetPassword(body: { token: string; password: string }) {
+  await call(() => api.POST("/api/v1/auth/reset-password", { body }), { auth: false });
+}
+
 const pendingVerifications = new Map<string, Promise<void>>();
 
 export function verifyEmail(token: string) {

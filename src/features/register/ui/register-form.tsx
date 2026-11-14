@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { register } from "@entities/session";
 import { ApiError } from "@shared/api";
 import { legal } from "@shared/config/legal";
-import { Button, FieldError, Input, Label, Notice } from "@shared/ui";
+import { Button, FieldError, Input, Label, Notice, PasswordHints } from "@shared/ui";
 
 import { registerSchema, type RegisterValues } from "../model/schema";
 
@@ -14,7 +14,9 @@ export function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: { email: "", password: "", consent: false as unknown as true },
+    mode: "onChange",
   });
+  const password = form.watch("password");
 
   async function onSubmit(values: RegisterValues) {
     setFormError("");
@@ -41,6 +43,7 @@ export function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
       <div>
         <Label htmlFor="register-password">Пароль</Label>
         <Input id="register-password" autoComplete="new-password" type="password" {...form.register("password")} />
+        <PasswordHints password={password} />
         <FieldError>{form.formState.errors.password?.message}</FieldError>
       </div>
       <label className="flex items-start gap-3 text-sm leading-5 text-stone-700">

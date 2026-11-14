@@ -93,14 +93,16 @@ function SortableQuestion({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        "flex items-center gap-2 rounded-2xl border px-2 py-2",
-        selected ? "border-orange-700 bg-orange-50" : "border-stone-200 bg-stone-50",
+        "flex items-center gap-2 rounded-2xl border px-2 py-2 backdrop-blur transition",
+        selected
+          ? "border-orange-400/80 bg-orange-50/80 shadow-sm shadow-orange-600/10"
+          : "border-white/60 bg-white/45 hover:bg-white/70",
       )}
     >
       {canEdit ? (
         <button
           type="button"
-          className="cursor-grab rounded-lg p-2 text-stone-500 hover:bg-white"
+          className="cursor-grab rounded-lg p-2 text-stone-500 hover:bg-white/80"
           aria-label="Перетащить вопрос"
           {...attributes}
           {...listeners}
