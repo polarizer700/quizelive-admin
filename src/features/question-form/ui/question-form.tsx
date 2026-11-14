@@ -8,6 +8,7 @@ import { ApiError } from "@shared/api";
 import { Button, FieldError, Input, Label, Notice, Select, Textarea } from "@shared/ui";
 
 import { emptyQuestion, questionSchema, type QuestionValues } from "../model/schema";
+import { ImageDropzone } from "./image-dropzone";
 
 function toValues(question: Question): QuestionValues {
   return {
@@ -58,13 +59,15 @@ export function QuestionForm({
   onDeleteImage,
 }: {
   question: Question | null;
-  onSubmit: (body: QuestionInput) => Promise<void>;
+  onSubmit: (body: QuestionInput, image: File | null) => Promise<void>;
   onDelete?: () => Promise<void>;
   onUploadImage?: (file: File) => Promise<void>;
   onDeleteImage?: () => Promise<void>;
 }) {
   const [formError, setFormError] = useState("");
   const [imageBusy, setImageBusy] = useState(false);
+  const [pendingImage, setPendingImage] = useState<File | null>(null);
+  const [pendingPreview, setPendingPreview] = useState<string | null>(null);
   const form = useForm<QuestionValues>({
     resolver: zodResolver(questionSchema),
     defaultValues: question ? toValues(question) : emptyQuestion,
@@ -78,10 +81,17 @@ export function QuestionForm({
     form.reset(question ? toValues(question) : emptyQuestion);
   }, [form, question]);
 
+  useEffect(
+    () => () => {
+      if (pendingPreview) URL.revokeObjectURL(pendingPreview);
+    },
+    [pendingPreview],
+  );
+
   async function submit(values: QuestionValues) {
     setFormError("");
     try {
-      await onSubmit(toPayload(values));
+      await onSubmit(toPayload(values), pendingImage);
     } catch (error) {
       if (error instanceof ApiError) {
         setFormError(error.message);
@@ -138,45 +148,52 @@ export function QuestionForm({
         <FieldError>{form.formState.errors.text?.message}</FieldError>
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="question-image">Картинка</Label>
-        {question?.image_url ? (
-          <img src={question.image_url} alt="" className="max-h-48 w-fit rounded-2xl object-contain" />
-        ) : (
-          <p className="text-sm text-stone-500">JPEG, PNG или WebP до 5 МБ. Сначала сохраните вопрос.</p>
-        )}
-        {onUploadImage && question ? (
-          <div className="flex flex-wrap gap-2">
-            <Input
-              id="question-image"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              disabled={imageBusy}
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                event.target.value = "";
-                if (!file) return;
+        <Label>Картинка <span className="font-normal text-stone-400">(необязательно)</span></Label>
+        {question ? (
+          onUploadImage ? (
+            <ImageDropzone
+              previewUrl={question.image_url ?? null}
+              busy={imageBusy}
+              onFile={(file) => {
                 setImageBusy(true);
                 void onUploadImage(file)
                   .catch((error) => setFormError(error instanceof Error ? error.message : "Не удалось загрузить картинку"))
                   .finally(() => setImageBusy(false));
               }}
+              onClear={
+                question.image_url && onDeleteImage
+                  ? () => {
+                      setImageBusy(true);
+                      void onDeleteImage()
+                        .catch((error) => setFormError(error instanceof Error ? error.message : "Не удалось удалить картинку"))
+                        .finally(() => setImageBusy(false));
+                    }
+                  : undefined
+              }
             />
-            {question.image_url && onDeleteImage ? (
-              <Button
-                tone="ghost"
-                disabled={imageBusy}
-                onClick={() => {
-                  setImageBusy(true);
-                  void onDeleteImage()
-                    .catch((error) => setFormError(error instanceof Error ? error.message : "Не удалось удалить картинку"))
-                    .finally(() => setImageBusy(false));
-                }}
-              >
-                Убрать картинку
-              </Button>
-            ) : null}
-          </div>
-        ) : null}
+          ) : question.image_url ? (
+            <img src={question.image_url} alt="" className="max-h-48 w-fit rounded-2xl object-contain" />
+          ) : null
+        ) : (
+          <ImageDropzone
+            previewUrl={pendingPreview}
+            busy={form.formState.isSubmitting}
+            onFile={(file) => {
+              setPendingImage(file);
+              setPendingPreview((current) => {
+                if (current) URL.revokeObjectURL(current);
+                return URL.createObjectURL(file);
+              });
+            }}
+            onClear={() => {
+              setPendingImage(null);
+              setPendingPreview((current) => {
+                if (current) URL.revokeObjectURL(current);
+                return null;
+              });
+            }}
+          />
+        )}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>

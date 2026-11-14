@@ -1693,6 +1693,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"attr-accept@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "attr-accept@npm:4.0.1"
+  checksum: 10c0/a97d7a188a461edaf4584322c33103d8cbdfde6b1465f92e0a7a93fe354fde9764e9e491720dbd4bacc0e7bcc6ec21c6b93eac5d7b9982fb57a922c15256e62a
+  languageName: node
+  linkType: hard
+
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -2377,6 +2384,13 @@ __metadata:
   dependencies:
     flat-cache: "npm:^4.0.0"
   checksum: 10c0/9e2b5938b1cd9b6d7e3612bdc533afd4ac17b2fc646569e9a8abbf2eb48e5eb8e316bc38815a3ef6a1b456f4107f0d0f055a614ca613e75db6bf9ff4d72c1638
+  languageName: node
+  linkType: hard
+
+"file-selector@npm:^5.0.1":
+  version: 5.0.2
+  resolution: "file-selector@npm:5.0.2"
+  checksum: 10c0/963fb5f1303c8e34716143276c719da3584a74acdadf8dbb58486a76e7d6adcc8f4de31dc9d2fa2607550f2e8681cb39e60fa2354943be809eb70e4362a214c8
   languageName: node
   linkType: hard
 
@@ -3274,6 +3288,7 @@ __metadata:
     qrcode: "npm:^1.5.4"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
+    react-dropzone: "npm:^20.2.0"
     react-hook-form: "npm:^7.66.0"
     react-is: "npm:^19.3.1"
     recharts: "npm:^3.10.1"
@@ -3295,6 +3310,22 @@ __metadata:
   peerDependencies:
     react: ^19.3.1
   checksum: 10c0/382700916313b2ebc46acee80642f300bb8601eac6a9e7fefade5b8b30e66b05bf3aaa56a3c964589fcd578d27b486e847470c2697d879264e766661ff49fac7
+  languageName: node
+  linkType: hard
+
+"react-dropzone@npm:^20.2.0":
+  version: 20.2.0
+  resolution: "react-dropzone@npm:20.2.0"
+  dependencies:
+    attr-accept: "npm:^4.0.1"
+    file-selector: "npm:^5.0.1"
+  peerDependencies:
+    "@types/react": "*"
+    react: ">= 18"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/fcd1e241c99b47ae078f90b6ef9861adf5bb25acc7e590598ec8b0ab33c7ea8d6025e0f93c33dd235f1d43dfdf714c22a3aabe346de70770f47c6815079fff49
   languageName: node
   linkType: hard
 
