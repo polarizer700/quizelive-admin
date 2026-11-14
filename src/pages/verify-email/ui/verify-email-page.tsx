@@ -7,15 +7,13 @@ import { AuthFrame } from "@widgets/auth-frame";
 
 export function VerifyEmailPage() {
   const token = new URLSearchParams(window.location.search).get("token") ?? "";
-  const [state, setState] = useState<"pending" | "done" | "failed">("pending");
-  const [message, setMessage] = useState("Проверяем ссылку…");
+  const [state, setState] = useState<"pending" | "done" | "failed">(token ? "pending" : "failed");
+  const [message, setMessage] = useState(
+    token ? "Проверяем ссылку…" : "В ссылке нет кода подтверждения.",
+  );
 
   useEffect(() => {
-    if (!token) {
-      setState("failed");
-      setMessage("В ссылке нет кода подтверждения.");
-      return;
-    }
+    if (!token) return;
 
     let active = true;
     verifyEmail(token)

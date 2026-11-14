@@ -3,7 +3,7 @@ import { Link, useParams } from "@tanstack/react-router";
 import { HelpCircle, Timer } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import QRCode from "qrcode";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { canEditQuizzes, statusLabel, useSessionStore } from "@entities/session";
 import { getQuiz, issueHostToken, quizKeys, updateQuiz } from "@entities/quiz";
@@ -36,7 +36,7 @@ function QuizEditor({ quizId }: { quizId: string }) {
   const role = useSessionStore((state) => state.user?.role);
   const canEdit = canEditQuizzes(role);
   const queryClient = useQueryClient();
-  const [selected, setSelected] = useState<string | null>(null);
+  const [chosen, setChosen] = useState<string | null>(null);
   const [actionError, setActionError] = useState("");
 
   const quiz = useQuery({ queryKey: quizKeys.detail(quizId), queryFn: () => getQuiz(quizId) });
@@ -55,30 +55,26 @@ function QuizEditor({ quizId }: { quizId: string }) {
     },
   });
 
-  const [screenURL, setScreenURL] = useState("");
-  const [screenQR, setScreenQR] = useState("");
+  const [screen, setScreen] = useState<{ quizId: string; url: string; qr: string } | null>(null);
+  const screenURL = screen?.quizId === quizId ? screen.url : "";
+  const screenQR = screen?.quizId === quizId ? screen.qr : "";
 
   const openScreen = useMutation({
     mutationFn: () => issueHostToken(quizId),
     onSuccess: async (host) => {
       const url = tvDeepLink(host.token);
-      setScreenURL(url);
-      setScreenQR(await QRCode.toDataURL(url, { margin: 1, width: 280, color: { dark: "#0c0a09", light: "#fafaf9" } }));
+      const qr = await QRCode.toDataURL(url, { margin: 1, width: 280, color: { dark: "#0c0a09", light: "#fafaf9" } });
+      setScreen({ quizId, url, qr });
       window.open(url, "_blank", "noopener,noreferrer");
     },
   });
 
-  useEffect(() => {
-    setScreenURL("");
-    setScreenQR("");
-  }, [quizId]);
-
   const saveQuestion = useMutation({
     mutationFn: (body: QuestionInput) =>
-      selected && selected !== "new" ? updateQuestion(quizId, selected, body) : createQuestion(quizId, body),
+      chosen && chosen !== "new" ? updateQuestion(quizId, chosen, body) : createQuestion(quizId, body),
     onSuccess: async (question) => {
       setActionError("");
-      setSelected(question.id);
+      setChosen(question.id);
       await queryClient.invalidateQueries({ queryKey: questionKeys.list(quizId) });
     },
   });
@@ -86,7 +82,7 @@ function QuizEditor({ quizId }: { quizId: string }) {
   const removeQuestion = useMutation({
     mutationFn: (questionId: string) => deleteQuestion(quizId, questionId),
     onSuccess: async () => {
-      setSelected(null);
+      setChosen(null);
       setActionError("");
       await queryClient.invalidateQueries({ queryKey: questionKeys.list(quizId) });
     },
@@ -117,8 +113,10 @@ function QuizEditor({ quizId }: { quizId: string }) {
     },
   });
 
+  const selected = chosen ?? (canEdit && questions.data?.length === 0 ? "new" : null);
   const current = questions.data?.find((question) => question.id === selected) ?? null;
   const reduceMotion = useReducedMotion();
+
   const questionStats = useMemo(() => {
     const list = questions.data ?? [];
     const points = list.reduce((sum, question) => sum + (question.points ?? 0), 0);
@@ -242,7 +240,7 @@ function QuizEditor({ quizId }: { quizId: string }) {
           delay={240}
           action={
             canEdit ? (
-              <Button tone="ghost" onClick={() => setSelected("new")}>
+              <Button tone="ghost" onClick={() => setChosen("new")}>
                 Новый вопрос
               </Button>
             ) : null
@@ -255,7 +253,7 @@ function QuizEditor({ quizId }: { quizId: string }) {
               questions={questions.data}
               selectedId={selected}
               canEdit={canEdit}
-              onSelect={setSelected}
+              onSelect={setChosen}
               onReorder={(ids) => reorder.mutate(ids)}
             />
           ) : null}
@@ -266,8 +264,12 @@ function QuizEditor({ quizId }: { quizId: string }) {
             <QuestionForm
               key={selected === "new" ? "new" : current?.id ?? selected}
               question={selected === "new" ? null : current}
-              onSubmit={async (body) => {
-                await saveQuestion.mutateAsync(body);
+              onSubmit={async (body, image) => {
+                const saved = await saveQuestion.mutateAsync(body);
+                if (image) {
+                  await uploadQuestionImage(quizId, saved.id, image);
+                  await queryClient.invalidateQueries({ queryKey: questionKeys.list(quizId) });
+                }
               }}
               onDelete={
                 selected !== "new" && current
