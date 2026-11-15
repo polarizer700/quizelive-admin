@@ -5,8 +5,9 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { gameTypeLabel, useSessionStore } from "@entities/session";
-import { listPublicGames, publicGameKeys } from "@entities/quiz";
-import { errorMessage } from "@shared/api";
+import { issueHostToken, listPublicGames, publicGameKeys } from "@entities/quiz";
+import { ApiError, errorMessage } from "@shared/api";
+import { tvDeepLink } from "@shared/config/play";
 import { formatDateTime } from "@shared/lib/format";
 import { Badge, Button, Notice, Panel } from "@shared/ui";
 
@@ -16,6 +17,7 @@ export function QuizzesAllPage() {
   const user = useSessionStore((state) => state.user);
   const [offset, setOffset] = useState(0);
   const [copiedId, setCopiedId] = useState("");
+  const [pendingId, setPendingId] = useState("");
   const [actionError, setActionError] = useState("");
 
   const publicGames = useQuery({
@@ -23,14 +25,23 @@ export function QuizzesAllPage() {
     queryFn: () => listPublicGames({ limit, offset }),
   });
 
+  // Ссылка ведёт на сам экран игры в play-приложении (/tv), а не на карточку в студии.
   async function copyGameLink(gameId: string) {
     setActionError("");
+    setPendingId(gameId);
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/games/${gameId}`);
+      const host = await issueHostToken(gameId);
+      await navigator.clipboard.writeText(tvDeepLink(host.token));
       setCopiedId(gameId);
       window.setTimeout(() => setCopiedId((current) => (current === gameId ? "" : current)), 2000);
-    } catch {
-      setActionError("Не удалось скопировать ссылку на игру");
+    } catch (error) {
+      setActionError(
+        error instanceof ApiError && error.status === 403
+          ? "Ссылку на игру может получить только её автор, ведущий или админ"
+          : errorMessage(error, "Не удалось получить ссылку на игру"),
+      );
+    } finally {
+      setPendingId("");
     }
   }
 
@@ -51,6 +62,7 @@ export function QuizzesAllPage() {
             userId={user?.id ?? ""}
             userRole={user?.role}
             copiedId={copiedId}
+            pendingId={pendingId}
             onCopy={(gameId) => void copyGameLink(gameId)}
           />
         ) : null}
@@ -80,6 +92,7 @@ function PublicGameTable({
   userId,
   userRole,
   copiedId,
+  pendingId,
   onCopy,
 }: {
   games: {
@@ -94,6 +107,7 @@ function PublicGameTable({
   userId: string;
   userRole?: string;
   copiedId: string;
+  pendingId: string;
   onCopy: (gameId: string) => void;
 }) {
   const reduceMotion = useReducedMotion();
@@ -128,9 +142,14 @@ function PublicGameTable({
               ) : null}
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <Button tone="ghost" onClick={() => onCopy(game.id)} aria-label="Скопировать ссылку на игру">
+              <Button
+                tone="ghost"
+                onClick={() => onCopy(game.id)}
+                disabled={pendingId === game.id}
+                aria-label="Скопировать ссылку на игру"
+              >
                 {copiedId === game.id ? <Check size={16} /> : <Link2 size={16} />}
-                {copiedId === game.id ? "Скопировано" : "Ссылка на игру"}
+                {copiedId === game.id ? "Скопировано" : pendingId === game.id ? "Получаем…" : "Ссылка на игру"}
               </Button>
               <Link
                 to="/games/$gameId"

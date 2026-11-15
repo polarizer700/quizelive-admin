@@ -7,7 +7,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { getQuiz, issueHostToken, quizKeys } from "@entities/quiz";
 import { listQuestions, questionKeys } from "@entities/question";
 import { gameTypeLabel, questionTypeLabel, statusLabel, useSessionStore } from "@entities/session";
-import { errorMessage } from "@shared/api";
+import { ApiError, errorMessage } from "@shared/api";
 import { tvDeepLink } from "@shared/config/play";
 import { Badge, Button, Notice, PageHeader, Panel } from "@shared/ui";
 
@@ -34,12 +34,22 @@ function GameView({ gameId }: { gameId: string }) {
     onError: (error) => setActionError(errorMessage(error, "Не удалось открыть экран")),
   });
 
+  // Ссылка ведёт на сам экран игры в play-приложении (/tv), а не на карточку в студии.
   function copyLink() {
-    const url = `${window.location.origin}/games/${gameId}`;
-    void navigator.clipboard.writeText(url).then(() => {
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    });
+    setActionError("");
+    issueHostToken(gameId)
+      .then(async (host) => {
+        await navigator.clipboard.writeText(tvDeepLink(host.token));
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 2000);
+      })
+      .catch((error: unknown) => {
+        setActionError(
+          error instanceof ApiError && error.status === 403
+            ? "Ссылку на игру может получить только её автор, ведущий или админ"
+            : errorMessage(error, "Не удалось получить ссылку на игру"),
+        );
+      });
   }
 
   const own = Boolean(user && quiz.data && (user.id === quiz.data.owner_id || user.role === "admin"));
