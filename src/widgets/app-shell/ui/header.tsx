@@ -10,9 +10,9 @@ import { cn } from "@shared/lib/cn";
 function pageContext(pathname: string) {
   if (pathname.startsWith("/users")) return { title: "Команда", hint: "Доступ и роли студии" };
   if (pathname === "/quizzes/new") return { title: "Новая игра", hint: "Карточка, затем вопросы" };
-  if (pathname.startsWith("/quizzes/") && pathname !== "/quizzes") {
-    return { title: "Редактор", hint: "Карточка, вопросы и эфир" };
-  }
+  if (pathname.startsWith("/quizzes/mine")) return { title: "Витрина", hint: "Мои игры" };
+  if (pathname.startsWith("/quizzes/all")) return { title: "Витрина", hint: "Все опубликованные игры" };
+  if (pathname.startsWith("/quizzes/")) return { title: "Редактор", hint: "Карточка, вопросы и эфир" };
   if (pathname.startsWith("/games/")) return { title: "Игра из витрины", hint: "Просмотр и ссылка" };
   if (pathname === "/quizzes") return { title: "Витрина", hint: "Мои игры и все опубликованные" };
   if (pathname.startsWith("/profile")) return { title: "Профиль", hint: "Учётная запись" };

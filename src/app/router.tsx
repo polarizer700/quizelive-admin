@@ -10,7 +10,7 @@ import { ProfilePage } from "@pages/profile";
 import { GameViewPage } from "@pages/game-view";
 import { QuizCreatePage } from "@pages/quiz-create";
 import { QuizEditorPage } from "@pages/quiz-editor";
-import { QuizzesPage } from "@pages/quizzes";
+import { QuizzesAllPage, QuizzesMinePage, QuizzesPage } from "@pages/quizzes";
 import { UsersPage } from "@pages/users";
 import { VerifyEmailPage } from "@pages/verify-email";
 import { AppShell } from "@widgets/app-shell";
@@ -87,6 +87,26 @@ const quizzesRoute = createRoute({
   component: QuizzesPage,
 });
 
+const quizzesIndexRoute = createRoute({
+  getParentRoute: () => quizzesRoute,
+  path: "/",
+  beforeLoad: () => {
+    throw redirect({ to: "/quizzes/mine" });
+  },
+});
+
+const quizzesMineRoute = createRoute({
+  getParentRoute: () => quizzesRoute,
+  path: "mine",
+  component: QuizzesMinePage,
+});
+
+const quizzesAllRoute = createRoute({
+  getParentRoute: () => quizzesRoute,
+  path: "all",
+  component: QuizzesAllPage,
+});
+
 const quizCreateRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "quizzes/new",
@@ -130,7 +150,15 @@ const routeTree = rootRoute.addChildren([
   resetPasswordRoute,
   registerRoute,
   verifyRoute,
-  appRoute.addChildren([dashboardRoute, quizzesRoute, quizCreateRoute, quizRoute, gameViewRoute, usersRoute, profileRoute]),
+  appRoute.addChildren([
+    dashboardRoute,
+    quizzesRoute.addChildren([quizzesIndexRoute, quizzesMineRoute, quizzesAllRoute]),
+    quizCreateRoute,
+    quizRoute,
+    gameViewRoute,
+    usersRoute,
+    profileRoute,
+  ]),
 ]);
 
 export const router = createRouter({
