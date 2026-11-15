@@ -5,6 +5,8 @@ import { ForgotPasswordPage } from "@pages/forgot-password";
 import { LoginPage } from "@pages/login";
 import { RegisterPage } from "@pages/register";
 import { ResetPasswordPage } from "@pages/reset-password";
+import { GamesPage } from "@pages/games";
+import { GameViewPage } from "@pages/game-view";
 import { QuizCreatePage } from "@pages/quiz-create";
 import { QuizEditorPage } from "@pages/quiz-editor";
 import { QuizzesPage } from "@pages/quizzes";
@@ -93,6 +95,18 @@ const quizRoute = createRoute({
   component: QuizEditorPage,
 });
 
+const gamesRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "games",
+  component: GamesPage,
+});
+
+const gameViewRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "games/$gameId",
+  component: GameViewPage,
+});
+
 const usersRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "users",
@@ -109,7 +123,7 @@ const routeTree = rootRoute.addChildren([
   resetPasswordRoute,
   registerRoute,
   verifyRoute,
-  appRoute.addChildren([quizzesRoute, quizCreateRoute, quizRoute, usersRoute]),
+  appRoute.addChildren([quizzesRoute, quizCreateRoute, quizRoute, gamesRoute, gameViewRoute, usersRoute]),
 ]);
 
 export const router = createRouter({

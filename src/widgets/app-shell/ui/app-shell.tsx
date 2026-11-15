@@ -1,6 +1,6 @@
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Clapperboard, LayoutGrid, LogOut, Users } from "lucide-react";
+import { Clapperboard, LayoutGrid, LibraryBig, LogOut, Users } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { canManageUsers, logout, roleLabel, useSessionStore } from "@entities/session";
@@ -16,6 +16,8 @@ function greeting() {
 
 function pageContext(pathname: string) {
   if (pathname.startsWith("/users")) return { title: "Команда", hint: "Доступ и роли студии" };
+  if (pathname.startsWith("/games/")) return { title: "Игра из каталога", hint: "Просмотр и ссылка" };
+  if (pathname === "/games") return { title: "Каталог", hint: "Опубликованные игры студии" };
   if (pathname === "/quizzes/new") return { title: "Новая игра", hint: "Карточка, затем вопросы" };
   if (pathname.startsWith("/quizzes/") && pathname !== "/quizzes") {
     return { title: "Редактор", hint: "Карточка, вопросы и эфир" };
@@ -68,6 +70,17 @@ export function AppShell() {
           >
             <LayoutGrid size={16} />
             Игры
+          </Link>
+          <Link
+            to="/games"
+            className="nav-link flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm text-stone-600 hover:bg-white/55"
+            activeProps={{
+              className:
+                "nav-link flex items-center gap-3 rounded-2xl bg-stone-950 px-3 py-2.5 text-sm text-white shadow-lg shadow-stone-950/15",
+            }}
+          >
+            <LibraryBig size={16} />
+            Каталог
           </Link>
           {canManageUsers(user?.role) ? (
             <Link

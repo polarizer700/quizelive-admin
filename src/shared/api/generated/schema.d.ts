@@ -166,6 +166,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/games/public": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listPublicGames"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quizzes/{quizId}": {
         parameters: {
             query?: never;
@@ -353,6 +369,23 @@ export interface components {
         };
         QuizList: {
             items: components["schemas"]["Quiz"][];
+            /** Format: int64 */
+            total: number;
+        };
+        PublicGame: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            description: string;
+            /** Format: uuid */
+            owner_id: string;
+            game_type: components["schemas"]["QuizGameType"];
+            questions_count: number;
+            /** Format: date-time */
+            created_at: string;
+        };
+        PublicGameList: {
+            items: components["schemas"]["PublicGame"][];
             /** Format: int64 */
             total: number;
         };
@@ -814,6 +847,30 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+        };
+    };
+    listPublicGames: {
+        parameters: {
+            query?: {
+                limit?: components["parameters"]["Limit"];
+                offset?: components["parameters"]["Offset"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Каталог опубликованных игр */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicGameList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
         };
     };
     getQuiz: {

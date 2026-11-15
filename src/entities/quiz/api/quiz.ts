@@ -8,6 +8,13 @@ export type QuizList = components["schemas"]["QuizList"];
 export type CreateQuizRequest = components["schemas"]["CreateQuizRequest"];
 export type UpdateQuizRequest = components["schemas"]["UpdateQuizRequest"];
 export type HostToken = components["schemas"]["HostToken"];
+export type PublicGame = components["schemas"]["PublicGame"];
+export type PublicGameList = components["schemas"]["PublicGameList"];
+
+export const publicGameKeys = {
+  all: ["public-games"] as const,
+  list: (query: { limit: number; offset: number }) => [...publicGameKeys.all, "list", query] as const,
+};
 
 export const quizKeys = {
   all: ["quizzes"] as const,
@@ -25,6 +32,14 @@ export function listQuizzes(query: { limit: number; offset: number; status?: Qui
           ...(query.status ? { status: query.status } : {}),
         },
       },
+    }),
+  );
+}
+
+export function listPublicGames(query: { limit: number; offset: number }) {
+  return call<PublicGameList>(() =>
+    api.GET("/api/v1/games/public", {
+      params: { query: { limit: query.limit, offset: query.offset } },
     }),
   );
 }
