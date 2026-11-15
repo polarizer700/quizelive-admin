@@ -48,6 +48,8 @@ function QuizEditor({ quizId }: { quizId: string }) {
         title: values.title.trim(),
         description: values.description.trim(),
         status: values.status,
+        game_type: values.game_type,
+        break_after_round: values.break_after_round,
       }),
     onSuccess: async () => {
       setActionError("");
@@ -140,11 +142,11 @@ function QuizEditor({ quizId }: { quizId: string }) {
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
         <Link to="/quizzes" className="text-sm text-stone-500 transition hover:text-stone-800">
-          ← К викторинам
+          ← К играм
         </Link>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <h1 className="text-3xl font-semibold tracking-tight text-stone-950 md:text-4xl">
-            {quiz.data?.title ?? "Викторина"}
+            {quiz.data?.title ?? "Игра"}
           </h1>
           {quiz.data ? <Badge tone={quiz.data.status}>{statusLabel[quiz.data.status]}</Badge> : null}
         </div>
@@ -176,7 +178,7 @@ function QuizEditor({ quizId }: { quizId: string }) {
       ) : null}
 
       {actionError ? <Notice>{actionError}</Notice> : null}
-      {quiz.isError ? <Notice>{errorMessage(quiz.error, "Викторина не найдена")}</Notice> : null}
+      {quiz.isError ? <Notice>{errorMessage(quiz.error, "Игра не найдена")}</Notice> : null}
 
       {quiz.data && canEdit ? (
         <Panel title="Карточка" delay={180}>

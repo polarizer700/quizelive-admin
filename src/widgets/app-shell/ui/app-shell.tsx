@@ -16,11 +16,11 @@ function greeting() {
 
 function pageContext(pathname: string) {
   if (pathname.startsWith("/users")) return { title: "Команда", hint: "Доступ и роли студии" };
-  if (pathname === "/quizzes/new") return { title: "Новая викторина", hint: "Карточка, затем вопросы" };
+  if (pathname === "/quizzes/new") return { title: "Новая игра", hint: "Карточка, затем вопросы" };
   if (pathname.startsWith("/quizzes/") && pathname !== "/quizzes") {
     return { title: "Редактор", hint: "Карточка, вопросы и эфир" };
   }
-  return { title: "Обзор", hint: "Каталог викторин и статусы" };
+  return { title: "Обзор", hint: "Каталог игр и статусы" };
 }
 
 export function AppShell() {
@@ -51,7 +51,7 @@ export function AppShell() {
         <div className="relative px-2">
           <p className="text-xs font-medium uppercase tracking-[0.22em] text-orange-700">QuizeLive</p>
           <p className="mt-1 font-serif text-3xl italic text-stone-950">Эфир</p>
-          <p className="mt-2 text-sm text-stone-500">Студия викторин</p>
+          <p className="mt-2 text-sm text-stone-500">Студия игр</p>
         </div>
 
         <nav className="relative mt-8 flex gap-2 md:flex-col">
@@ -67,7 +67,7 @@ export function AppShell() {
             }}
           >
             <LayoutGrid size={16} />
-            Викторины
+            Игры
           </Link>
           {canManageUsers(user?.role) ? (
             <Link

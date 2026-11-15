@@ -50,7 +50,7 @@ export function QuestionList({
   }
 
   if (questions.length === 0) {
-    return <p className="text-sm text-stone-500">В викторине ещё нет вопросов.</p>;
+    return <p className="text-sm text-stone-500">В игре ещё нет вопросов.</p>;
   }
 
   return (
@@ -117,6 +117,7 @@ function SortableQuestion({
           {question.position}. {question.text}
         </span>
         <span className="text-xs text-stone-500">
+          {question.category ? `${question.category} · ` : ""}
           {questionTypeLabel[question.type]} · {question.points} б. · {question.time_limit_sec} с
         </span>
       </button>

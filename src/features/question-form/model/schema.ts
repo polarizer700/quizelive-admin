@@ -11,6 +11,7 @@ export const questionSchema = z
     text: z.string().trim().min(1, "Введите текст вопроса").max(2000, "Не длиннее 2000 символов"),
     time_limit_sec: z.number({ error: "Укажите время" }).int().min(5, "Минимум 5 секунд").max(300, "Максимум 300 секунд"),
     points: z.number({ error: "Укажите баллы" }).int().min(1, "Минимум 1 балл").max(10000, "Максимум 10000 баллов"),
+    category: z.string().trim().max(100, "Не длиннее 100 символов"),
     options: z.array(optionSchema).max(8),
     text_answers: z.array(z.string()).max(20),
   })
@@ -57,6 +58,7 @@ export const emptyQuestion: QuestionValues = {
   text: "",
   time_limit_sec: 20,
   points: 100,
+  category: "",
   options: [
     { text: "", is_correct: true },
     { text: "", is_correct: false },

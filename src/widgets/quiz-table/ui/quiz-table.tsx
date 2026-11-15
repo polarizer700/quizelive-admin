@@ -3,7 +3,7 @@ import { ArrowUpRight, Trash2 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 
 import type { Quiz } from "@entities/quiz";
-import { statusLabel } from "@entities/session";
+import { gameTypeLabel, statusLabel } from "@entities/session";
 import { formatDateTime } from "@shared/lib/format";
 import { Badge, Button } from "@shared/ui";
 
@@ -19,7 +19,7 @@ export function QuizTable({
   const reduceMotion = useReducedMotion();
 
   if (quizzes.length === 0) {
-    return <p className="text-sm text-stone-500">Пока нет викторин.</p>;
+    return <p className="text-sm text-stone-500">Пока нет игр.</p>;
   }
 
   return (
@@ -37,6 +37,7 @@ export function QuizTable({
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="truncate font-medium text-stone-950">{quiz.title}</h3>
               <Badge tone={quiz.status}>{statusLabel[quiz.status]}</Badge>
+              <Badge tone="editor">{gameTypeLabel[quiz.game_type]}</Badge>
             </div>
             <p className="mt-1 text-sm text-stone-500">Обновлена {formatDateTime(quiz.updated_at)}</p>
             {quiz.description ? (

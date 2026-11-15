@@ -55,7 +55,7 @@ export function QuizzesPage() {
       setActionError("");
       await queryClient.invalidateQueries({ queryKey: quizKeys.all });
     },
-    onError: (error) => setActionError(errorMessage(error, "Не удалось удалить викторину")),
+    onError: (error) => setActionError(errorMessage(error, "Не удалось удалить игру")),
   });
 
   const total = quizzes.data?.total ?? 0;
@@ -72,7 +72,7 @@ export function QuizzesPage() {
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <PageHeader
         eyebrow="Каталог"
-        title="Викторины"
+        title="Игры"
         description="Готовьте вопросы, публикуйте пакет и открывайте экран в зале."
         action={
           canEdit ? (
@@ -81,7 +81,7 @@ export function QuizzesPage() {
               className="inline-flex items-center gap-2 rounded-2xl bg-orange-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-orange-600/20 transition hover:-translate-y-0.5 hover:bg-orange-700"
             >
               <Plus size={16} />
-              Новая викторина
+              Новая игра
             </Link>
           ) : null
         }
@@ -141,9 +141,9 @@ export function QuizzesPage() {
       </div>
 
       {actionError ? <Notice>{actionError}</Notice> : null}
-      {quizzes.isError ? <Notice>{errorMessage(quizzes.error, "Не удалось загрузить викторины")}</Notice> : null}
+      {quizzes.isError ? <Notice>{errorMessage(quizzes.error, "Не удалось загрузить игры")}</Notice> : null}
 
-      <Panel title="Все викторины" delay={280}>
+      <Panel title="Все игры" delay={280}>
         {quizzes.isLoading ? <p className="text-sm text-stone-500">Загрузка…</p> : null}
         {quizzes.data ? (
           <QuizTable

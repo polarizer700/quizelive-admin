@@ -327,6 +327,14 @@ export interface components {
             expires_in: number;
             user: components["schemas"]["User"];
         };
+        /**
+         * @description Тип игры:
+         *     - quiz — викторина, вопросы подряд;
+         *     - pub_quiz — квиз, вопросы сгруппированы категориями в раунды, возможен перерыв;
+         *     - jeopardy — своя игра, категории как темы.
+         * @enum {string}
+         */
+        QuizGameType: "quiz" | "pub_quiz" | "jeopardy";
         Quiz: {
             /** Format: uuid */
             id: string;
@@ -335,6 +343,9 @@ export interface components {
             /** Format: uuid */
             owner_id: string;
             status: components["schemas"]["QuizStatus"];
+            game_type: components["schemas"]["QuizGameType"];
+            /** @description После какого раунда перерыв (только для pub_quiz; 0 — без перерыва) */
+            break_after_round: number;
             /** Format: date-time */
             created_at: string;
             /** Format: date-time */
@@ -348,11 +359,15 @@ export interface components {
         CreateQuizRequest: {
             title: string;
             description?: string;
+            game_type?: components["schemas"]["QuizGameType"];
+            break_after_round?: number;
         };
         UpdateQuizRequest: {
             title?: string;
             description?: string;
             status?: components["schemas"]["QuizStatus"];
+            game_type?: components["schemas"]["QuizGameType"];
+            break_after_round?: number;
         };
         HostToken: {
             token: string;
@@ -374,6 +389,8 @@ export interface components {
             text: string;
             time_limit_sec: number;
             points: number;
+            /** @description Необязательная категория (раунд) вопроса */
+            category?: string;
             options?: components["schemas"]["AnswerOptionInput"][];
             text_answers?: string[];
         };
@@ -387,6 +404,7 @@ export interface components {
             text: string;
             time_limit_sec: number;
             points: number;
+            category: string;
             image_url?: string;
             options: components["schemas"]["AnswerOption"][];
             text_answers: string[];

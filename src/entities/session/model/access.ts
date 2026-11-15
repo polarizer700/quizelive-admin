@@ -19,6 +19,12 @@ export const statusLabel = {
   published: "Опубликован",
 } as const;
 
+export const gameTypeLabel = {
+  quiz: "Викторина",
+  pub_quiz: "Квиз",
+  jeopardy: "Своя игра",
+} as const;
+
 export const questionTypeLabel = {
   single: "Один ответ",
   multiple: "Несколько ответов",

@@ -1,4 +1,4 @@
-export { canEditQuizzes, canManageUsers, questionTypeLabel, roleLabel, statusLabel } from "./model/access";
+export { canEditQuizzes, canManageUsers, gameTypeLabel, questionTypeLabel, roleLabel, statusLabel } from "./model/access";
 export { hasSessionHint } from "./model/store";
 export { useSessionStore } from "./model/store";
 export {

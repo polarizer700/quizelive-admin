@@ -16,6 +16,7 @@ function toValues(question: Question): QuestionValues {
     text: question.text,
     time_limit_sec: question.time_limit_sec,
     points: question.points,
+    category: question.category,
     options:
       question.options.length > 0
         ? question.options.map((option) => ({ text: option.text, is_correct: option.is_correct }))
@@ -30,6 +31,7 @@ function toPayload(values: QuestionValues): QuestionInput {
     text: values.text.trim(),
     time_limit_sec: values.time_limit_sec,
     points: values.points,
+    category: values.category.trim(),
   };
 
   if (values.type === "text") {
@@ -96,7 +98,7 @@ export function QuestionForm({
       if (error instanceof ApiError) {
         setFormError(error.message);
         for (const [field, message] of Object.entries(error.fields)) {
-          if (field === "text" || field === "type" || field === "time_limit_sec" || field === "points" || field === "options" || field === "text_answers") {
+          if (field === "text" || field === "type" || field === "time_limit_sec" || field === "points" || field === "category" || field === "options" || field === "text_answers") {
             form.setError(field, { message });
           }
         }
@@ -194,6 +196,13 @@ export function QuestionForm({
             }}
           />
         )}
+      </div>
+      <div>
+        <Label htmlFor="question-category">
+          Категория <span className="font-normal text-stone-400">(необязательно, для квиза и своей игры — раунд)</span>
+        </Label>
+        <Input id="question-category" placeholder="Например: Блиц" {...form.register("category")} />
+        <FieldError>{form.formState.errors.category?.message}</FieldError>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>

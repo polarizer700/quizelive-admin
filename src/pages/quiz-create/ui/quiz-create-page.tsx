@@ -16,7 +16,12 @@ export function QuizCreatePage() {
 
   const create = useMutation({
     mutationFn: (values: QuizValues) =>
-      createQuiz({ title: values.title.trim(), description: values.description.trim() }),
+      createQuiz({
+        title: values.title.trim(),
+        description: values.description.trim(),
+        game_type: values.game_type,
+        break_after_round: values.break_after_round,
+      }),
     onSuccess: async (quiz) => {
       await queryClient.invalidateQueries({ queryKey: quizKeys.all });
       await navigate({ to: "/quizzes/$quizId", params: { quizId: quiz.id } });
@@ -26,9 +31,9 @@ export function QuizCreatePage() {
   if (!canEdit) {
     return (
       <div className="mx-auto flex max-w-2xl flex-col gap-4">
-        <PageHeader title="Нет доступа" description="Создавать викторины могут редакторы и админы." />
+        <PageHeader title="Нет доступа" description="Создавать игры могут редакторы и админы." />
         <Link to="/quizzes" className="text-sm text-stone-500 transition hover:text-stone-800">
-          ← К викторинам
+          ← К играм
         </Link>
       </div>
     );
@@ -48,7 +53,7 @@ export function QuizCreatePage() {
         <div className="mt-3">
           <PageHeader
             eyebrow="Новая"
-            title="Создать викторину"
+            title="Создать игру"
             description="Заполните карточку — сразу откроется редактор, где можно добавить вопросы."
           />
         </div>
