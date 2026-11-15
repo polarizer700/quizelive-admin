@@ -5,8 +5,9 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { gameTypeLabel, useSessionStore } from "@entities/session";
-import { listPublicGames, publicGameKeys } from "@entities/quiz";
+import { issueHostToken, listPublicGames, publicGameKeys } from "@entities/quiz";
 import { errorMessage } from "@shared/api";
+import { tvDeepLink } from "@shared/config/play";
 import { formatDateTime } from "@shared/lib/format";
 import { Badge, Button, Notice, Panel } from "@shared/ui";
 
@@ -16,24 +17,34 @@ export function QuizzesAllPage() {
   const user = useSessionStore((state) => state.user);
   const [offset, setOffset] = useState(0);
   const [copiedId, setCopiedId] = useState("");
+  const [pendingId, setPendingId] = useState("");
+  const [actionError, setActionError] = useState("");
 
   const publicGames = useQuery({
     queryKey: publicGameKeys.list({ limit, offset }),
     queryFn: () => listPublicGames({ limit, offset }),
   });
 
-  function copyLink(gameId: string) {
-    const url = `${window.location.origin}/games/${gameId}`;
-    void navigator.clipboard.writeText(url).then(() => {
+  async function copyTvLink(gameId: string) {
+    setActionError("");
+    setPendingId(gameId);
+    try {
+      const host = await issueHostToken(gameId);
+      await navigator.clipboard.writeText(tvDeepLink(host.token));
       setCopiedId(gameId);
       window.setTimeout(() => setCopiedId((current) => (current === gameId ? "" : current)), 2000);
-    });
+    } catch (error) {
+      setActionError(errorMessage(error, "Не удалось получить ссылку на ТВ"));
+    } finally {
+      setPendingId("");
+    }
   }
 
   const total = publicGames.data?.total ?? 0;
 
   return (
     <>
+      {actionError ? <Notice>{actionError}</Notice> : null}
       {publicGames.isError ? (
         <Notice>{errorMessage(publicGames.error, "Не удалось загрузить каталог")}</Notice>
       ) : null}
@@ -46,7 +57,8 @@ export function QuizzesAllPage() {
             userId={user?.id ?? ""}
             userRole={user?.role}
             copiedId={copiedId}
-            onCopy={copyLink}
+            pendingId={pendingId}
+            onCopy={(gameId) => void copyTvLink(gameId)}
           />
         ) : null}
       </Panel>
@@ -75,6 +87,7 @@ function PublicGameTable({
   userId,
   userRole,
   copiedId,
+  pendingId,
   onCopy,
 }: {
   games: {
@@ -89,6 +102,7 @@ function PublicGameTable({
   userId: string;
   userRole?: string;
   copiedId: string;
+  pendingId: string;
   onCopy: (gameId: string) => void;
 }) {
   const reduceMotion = useReducedMotion();
@@ -123,9 +137,14 @@ function PublicGameTable({
               ) : null}
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <Button tone="ghost" onClick={() => onCopy(game.id)} aria-label="Скопировать ссылку">
+              <Button
+                tone="ghost"
+                onClick={() => onCopy(game.id)}
+                disabled={pendingId === game.id}
+                aria-label="Скопировать ссылку на ТВ"
+              >
                 {copiedId === game.id ? <Check size={16} /> : <Link2 size={16} />}
-                {copiedId === game.id ? "Скопировано" : "Ссылка"}
+                {copiedId === game.id ? "Скопировано" : pendingId === game.id ? "Получаем…" : "Ссылка"}
               </Button>
               <Link
                 to="/games/$gameId"
