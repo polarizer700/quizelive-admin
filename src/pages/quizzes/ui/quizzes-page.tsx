@@ -4,10 +4,12 @@ import { Plus } from "lucide-react";
 import { canEditQuizzes, useSessionStore } from "@entities/session";
 import { PageHeader } from "@shared/ui";
 
-const tabClass =
-  "rounded-xl border-[3px] border-ink bg-white px-4 py-2 font-mono text-sm font-bold uppercase tracking-wide text-ink shadow-[3px_3px_0_#111] transition hover:bg-acid";
-const tabActiveClass =
-  "rounded-xl border-[3px] border-ink bg-ink px-4 py-2 font-mono text-sm font-bold uppercase tracking-wide text-paper shadow-[3px_3px_0_rgba(17,17,17,0.35)] transition";
+// Роутер склеивает className и activeProps.className, поэтому конфликтующие
+// утилиты (bg-*, text-*) выносим в active/inactive — иначе побеждает порядок в CSS.
+const tabBaseClass =
+  "rounded-xl border-[3px] border-ink px-4 py-2 font-mono text-sm font-bold uppercase tracking-wide shadow-[3px_3px_0_#111] transition";
+const tabActiveClass = "bg-ink text-paper shadow-[3px_3px_0_rgba(17,17,17,0.35)]";
+const tabInactiveClass = "bg-white text-ink hover:bg-acid";
 
 export function QuizzesPage() {
   const user = useSessionStore((state) => state.user);
@@ -33,10 +35,20 @@ export function QuizzesPage() {
       />
 
       <nav className="flex gap-2">
-        <Link to="/quizzes/mine" className={tabClass} activeProps={{ className: tabActiveClass }}>
+        <Link
+          to="/quizzes/mine"
+          className={tabBaseClass}
+          activeProps={{ className: tabActiveClass }}
+          inactiveProps={{ className: tabInactiveClass }}
+        >
           Мои
         </Link>
-        <Link to="/quizzes/all" className={tabClass} activeProps={{ className: tabActiveClass }}>
+        <Link
+          to="/quizzes/all"
+          className={tabBaseClass}
+          activeProps={{ className: tabActiveClass }}
+          inactiveProps={{ className: tabInactiveClass }}
+        >
           Все игры
         </Link>
       </nav>

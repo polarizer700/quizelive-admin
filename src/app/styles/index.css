@@ -104,16 +104,12 @@ summary {
   }
 }
 
-/* Навигация в сайдбаре */
+/* Навигация в сайдбаре: рамка и цвета задаются утилитами (border-transparent /
+   border-ink, hover:border-ink), здесь — только плавность перехода. */
 .nav-link {
-  border: 2px solid transparent;
   transition:
     background-color 160ms ease,
     border-color 160ms ease;
-}
-
-.nav-link:hover {
-  border-color: var(--color-ink);
 }
 
 /* Тонкие скроллбары под бумагу */

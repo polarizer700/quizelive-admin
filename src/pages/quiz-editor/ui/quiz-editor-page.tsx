@@ -22,14 +22,35 @@ import {
 import { QuestionForm } from "@features/question-form";
 import { QuizForm, type QuizValues } from "@features/quiz-form";
 import { QuestionList } from "@widgets/question-list";
-import { errorMessage } from "@shared/api";
+import { ApiError, errorMessage } from "@shared/api";
 import { tvDeepLink } from "@shared/config/play";
-import { Badge, Button, Notice, PageHeader, Panel, StatCard, TrendArea } from "@shared/ui";
+import { Badge, Button, Notice, Panel, StatCard, TrendArea } from "@shared/ui";
 
 export function QuizEditorPage() {
   const { quizId } = useParams({ strict: false });
   if (!quizId) return null;
   return <QuizEditor quizId={quizId} />;
+}
+
+function ForbiddenScreen() {
+  return (
+    <div className="grid min-h-[70vh] place-items-center px-2">
+      <div className="flex w-full max-w-xl flex-col items-center gap-4 rounded-3xl border-[3px] border-ink bg-white p-8 text-center shadow-[8px_8px_0_#111] md:p-12">
+        <p className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-pink">Ошибка доступа</p>
+        <p className="text-7xl font-black uppercase leading-none tracking-tight text-ink md:text-8xl">403</p>
+        <h1 className="text-2xl font-black uppercase tracking-tight text-ink">Нет доступа</h1>
+        <p className="max-w-md text-sm text-stone-500">
+          Редактировать можно только свои игры. Чужую опубликованную игру можно открыть на витрине и взять ссылку.
+        </p>
+        <Link
+          to="/quizzes"
+          className="mt-2 inline-flex items-center gap-2 rounded-xl border-[3px] border-ink bg-acid px-4 py-2.5 text-sm font-bold text-ink shadow-[4px_4px_0_#111] transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#111]"
+        >
+          ← К витрине
+        </Link>
+      </div>
+    </div>
+  );
 }
 
 function QuizEditor({ quizId }: { quizId: string }) {
@@ -136,19 +157,10 @@ function QuizEditor({ quizId }: { quizId: string }) {
   }, [questions.data]);
 
   const own = Boolean(quiz.data && user && (role === "admin" || quiz.data.owner_id === user.id));
-  if (quiz.data && !own) {
-    return (
-      <div className="mx-auto flex max-w-2xl flex-col gap-4">
-        <PageHeader
-          eyebrow="403"
-          title="Нет доступа"
-          description="Редактировать можно только свои игры. Чужую опубликованную игру можно открыть на витрине и взять ссылку."
-        />
-        <Link to="/quizzes" className="font-mono text-xs font-bold uppercase text-stone-500 transition hover:text-ink">
-          ← К витрине
-        </Link>
-      </div>
-    );
+  const forbidden =
+    (quiz.error instanceof ApiError && quiz.error.status === 403) || Boolean(quiz.data && user && !own);
+  if (forbidden) {
+    return <ForbiddenScreen />;
   }
 
   return (

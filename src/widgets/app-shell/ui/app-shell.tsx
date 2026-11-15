@@ -4,14 +4,34 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import { LegalLinks } from "@widgets/legal-links";
+import { cn } from "@shared/lib/cn";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
+
+const collapsedStorageKey = "quizelive.sidebar.collapsed";
+
+function readCollapsed() {
+  try {
+    return window.localStorage.getItem(collapsedStorageKey) === "1";
+  } catch {
+    return false;
+  }
+}
 
 export function AppShell() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const reduceMotion = useReducedMotion();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(readCollapsed);
   const [prevPathname, setPrevPathname] = useState(pathname);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(collapsedStorageKey, collapsed ? "1" : "0");
+    } catch {
+      // localStorage недоступен — просто не запоминаем состояние
+    }
+  }, [collapsed]);
 
   if (prevPathname !== pathname) {
     setPrevPathname(pathname);
@@ -32,15 +52,18 @@ export function AppShell() {
   }, [drawerOpen]);
 
   return (
-    <div className="min-h-screen md:grid md:grid-cols-[272px_1fr]">
-      {/* Десктопный сайдбар */}
+    <div className="min-h-screen md:grid md:grid-cols-[auto_1fr]">
+      {/* Десктопный сайдбар: развёрнутый или свёрнутый до иконок */}
       <motion.aside
-        className="sticky top-0 z-10 hidden h-screen border-r-[3px] border-ink bg-white md:block"
+        className={cn(
+          "sticky top-0 z-10 hidden h-screen overflow-hidden border-r-[3px] border-ink bg-white transition-[width] duration-300 ease-out md:block",
+          collapsed ? "w-[72px]" : "w-[272px]",
+        )}
         initial={reduceMotion ? false : { opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       >
-        <Sidebar />
+        <Sidebar collapsed={collapsed} onToggleCollapse={() => setCollapsed((value) => !value)} />
       </motion.aside>
 
       {/* Мобильная шторка */}
