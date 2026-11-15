@@ -2,21 +2,59 @@
 
 @theme {
   --font-sans: "Outfit Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Fraunces Variable", ui-serif, Georgia, serif;
-  --color-ink: #1c1917;
-  --color-mist: #eef1f6;
-  --color-glass: rgba(255, 255, 255, 0.62);
-  --color-signal: #ea580c;
+  --font-mono: "Space Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Neo-Brutalism palette */
+  --color-paper: #fdfcf7;
+  --color-ink: #111111;
+  --color-acid: #e8ff47;
+  --color-pink: #ff5da2;
+  --color-cobalt: #2b4bff;
+  --color-mint: #4fe3b0;
+
+  /* Переопределяем stone — тёплая нейтраль на базе бумаги и чернил */
+  --color-stone-50: #faf8ee;
+  --color-stone-100: #f3f0e4;
+  --color-stone-200: #e9e5d8;
+  --color-stone-300: #d8d4c8;
+  --color-stone-400: #9a978c;
+  --color-stone-500: #6f6c62;
+  --color-stone-600: #55534b;
+  --color-stone-700: #3d3c36;
+  --color-stone-800: #2a2925;
+  --color-stone-900: #1a1917;
+  --color-stone-950: #111111;
+
+  /* Акцент: orange → cobalt */
+  --color-orange-50: #eef1ff;
+  --color-orange-100: #dfe6ff;
+  --color-orange-200: #c0cfff;
+  --color-orange-300: #94aaff;
+  --color-orange-400: #5470ff;
+  --color-orange-500: #3b5bff;
+  --color-orange-600: #2b4bff;
+  --color-orange-700: #1f39cc;
+  --color-orange-800: #182ba0;
+  --color-orange-900: #101c6e;
+
+  /* emerald → mint */
+  --color-emerald-100: #d2f5e6;
+  --color-emerald-200: #b0ecd6;
+  --color-emerald-600: #12a171;
+  --color-emerald-800: #0c5c40;
+
+  /* sky → pink */
+  --color-sky-100: #ffd9ea;
+  --color-sky-500: #ff5da2;
+  --color-sky-900: #8f1d51;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse 80% 50% at 0% -10%, rgba(234, 88, 12, 0.12), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(14, 165, 233, 0.08), transparent 45%),
-    radial-gradient(ellipse 50% 35% at 50% 100%, rgba(28, 25, 23, 0.04), transparent 50%),
-    linear-gradient(180deg, #f5f7fb 0%, #eef1f6 55%, #e8ecf3 100%);
+  background-color: var(--color-paper);
+  background-image: radial-gradient(rgba(17, 17, 17, 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
   color: var(--color-ink);
   font-family: var(--font-sans);
 }
@@ -33,36 +71,59 @@ summary {
   cursor: pointer;
 }
 
+/* Brutal cards: белая панель, жирная рамка, жёсткая тень */
 .glass-card,
 .glass-panel,
 .dash-card {
-  background: var(--color-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.85) inset,
-    0 12px 32px -20px rgba(28, 25, 23, 0.22);
+  background: #ffffff;
+  border: 3px solid var(--color-ink);
+  box-shadow: 7px 7px 0 var(--color-ink);
   transition:
-    transform 220ms ease,
-    box-shadow 220ms ease,
-    border-color 220ms ease;
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .glass-card:hover,
 .dash-card:hover {
-  border-color: rgba(234, 88, 12, 0.22);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 20px 40px -22px rgba(28, 25, 23, 0.28);
+  transform: translate(-2px, -2px);
+  box-shadow: 9px 9px 0 var(--color-ink);
 }
 
 .glass-enter {
-  animation: glass-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: glass-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes glass-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Навигация в сайдбаре */
+.nav-link {
+  border: 2px solid transparent;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.nav-link:hover {
+  border-color: var(--color-ink);
+}
+
+/* Тонкие скроллбары под бумагу */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-stone-300) transparent;
 }
 
 .dash-enter {
-  animation: glass-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: glass-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .dash-enter-delay-1,
@@ -80,27 +141,6 @@ summary {
   animation-delay: 180ms;
 }
 
-.nav-link {
-  position: relative;
-  transition:
-    background-color 180ms ease,
-    color 180ms ease,
-    transform 180ms ease,
-    box-shadow 180ms ease;
-}
-
-@keyframes glass-rise {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .glass-card,
   .glass-panel,
@@ -111,9 +151,9 @@ summary {
     animation: none !important;
     transition: none !important;
   }
-
   .glass-card:hover,
   .dash-card:hover {
     transform: none;
+    box-shadow: 7px 7px 0 var(--color-ink);
   }
 }

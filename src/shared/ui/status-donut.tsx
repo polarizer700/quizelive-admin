@@ -1,6 +1,6 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-const DEFAULT_COLORS = ["#ea580c", "#0ea5e9", "#10b981", "#a8a29e", "#f59e0b"];
+const DEFAULT_COLORS = ["#2b4bff", "#ff5da2", "#4fe3b0", "#d8d4c8", "#e8ff47"];
 
 export type DonutSlice = {
   name: string;

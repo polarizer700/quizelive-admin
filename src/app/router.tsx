@@ -5,7 +5,7 @@ import { ForgotPasswordPage } from "@pages/forgot-password";
 import { LoginPage } from "@pages/login";
 import { RegisterPage } from "@pages/register";
 import { ResetPasswordPage } from "@pages/reset-password";
-import { GamesPage } from "@pages/games";
+import { DashboardPage } from "@pages/dashboard";
 import { GameViewPage } from "@pages/game-view";
 import { QuizCreatePage } from "@pages/quiz-create";
 import { QuizEditorPage } from "@pages/quiz-editor";
@@ -22,7 +22,7 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   beforeLoad: () => {
-    throw redirect({ to: useSessionStore.getState().accessToken ? "/quizzes" : "/login" });
+    throw redirect({ to: useSessionStore.getState().accessToken ? "/dashboard" : "/login" });
   },
 });
 
@@ -30,7 +30,7 @@ const registerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/register",
   beforeLoad: () => {
-    if (useSessionStore.getState().accessToken) throw redirect({ to: "/quizzes" });
+    if (useSessionStore.getState().accessToken) throw redirect({ to: "/dashboard" });
   },
   component: RegisterPage,
 });
@@ -45,7 +45,7 @@ const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
   beforeLoad: () => {
-    if (useSessionStore.getState().accessToken) throw redirect({ to: "/quizzes" });
+    if (useSessionStore.getState().accessToken) throw redirect({ to: "/dashboard" });
   },
   component: LoginPage,
 });
@@ -54,7 +54,7 @@ const forgotPasswordRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/forgot-password",
   beforeLoad: () => {
-    if (useSessionStore.getState().accessToken) throw redirect({ to: "/quizzes" });
+    if (useSessionStore.getState().accessToken) throw redirect({ to: "/dashboard" });
   },
   component: ForgotPasswordPage,
 });
@@ -72,6 +72,12 @@ const appRoute = createRoute({
     if (!useSessionStore.getState().accessToken) throw redirect({ to: "/login" });
   },
   component: AppShell,
+});
+
+const dashboardRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "dashboard",
+  component: DashboardPage,
 });
 
 const quizzesRoute = createRoute({
@@ -93,12 +99,6 @@ const quizRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "quizzes/$quizId",
   component: QuizEditorPage,
-});
-
-const gamesRoute = createRoute({
-  getParentRoute: () => appRoute,
-  path: "games",
-  component: GamesPage,
 });
 
 const gameViewRoute = createRoute({
@@ -123,7 +123,7 @@ const routeTree = rootRoute.addChildren([
   resetPasswordRoute,
   registerRoute,
   verifyRoute,
-  appRoute.addChildren([quizzesRoute, quizCreateRoute, quizRoute, gamesRoute, gameViewRoute, usersRoute]),
+  appRoute.addChildren([dashboardRoute, quizzesRoute, quizCreateRoute, quizRoute, gameViewRoute, usersRoute]),
 ]);
 
 export const router = createRouter({

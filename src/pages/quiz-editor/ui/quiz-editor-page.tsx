@@ -24,7 +24,7 @@ import { QuizForm, type QuizValues } from "@features/quiz-form";
 import { QuestionList } from "@widgets/question-list";
 import { errorMessage } from "@shared/api";
 import { tvDeepLink } from "@shared/config/play";
-import { Badge, Button, Notice, Panel, StatCard, TrendArea } from "@shared/ui";
+import { Badge, Button, Notice, PageHeader, Panel, StatCard, TrendArea } from "@shared/ui";
 
 export function QuizEditorPage() {
   const { quizId } = useParams({ strict: false });
@@ -33,7 +33,8 @@ export function QuizEditorPage() {
 }
 
 function QuizEditor({ quizId }: { quizId: string }) {
-  const role = useSessionStore((state) => state.user?.role);
+  const user = useSessionStore((state) => state.user);
+  const role = user?.role;
   const canEdit = canEditQuizzes(role);
   const queryClient = useQueryClient();
   const [chosen, setChosen] = useState<string | null>(null);
@@ -134,6 +135,22 @@ function QuizEditor({ quizId }: { quizId: string }) {
     return { count: list.length, points, avgTime, trend };
   }, [questions.data]);
 
+  const own = Boolean(quiz.data && user && (role === "admin" || quiz.data.owner_id === user.id));
+  if (quiz.data && !own) {
+    return (
+      <div className="mx-auto flex max-w-2xl flex-col gap-4">
+        <PageHeader
+          eyebrow="403"
+          title="Нет доступа"
+          description="Редактировать можно только свои игры. Чужую опубликованную игру можно открыть на витрине и взять ссылку."
+        />
+        <Link to="/quizzes" className="font-mono text-xs font-bold uppercase text-stone-500 transition hover:text-ink">
+          ← К витрине
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
       <motion.div
@@ -141,11 +158,11 @@ function QuizEditor({ quizId }: { quizId: string }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
-        <Link to="/quizzes" className="text-sm text-stone-500 transition hover:text-stone-800">
+        <Link to="/quizzes" className="font-mono text-xs font-bold uppercase text-stone-500 transition hover:text-ink">
           ← К играм
         </Link>
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-semibold tracking-tight text-stone-950 md:text-4xl">
+          <h1 className="text-3xl font-black uppercase tracking-tight text-ink md:text-4xl">
             {quiz.data?.title ?? "Игра"}
           </h1>
           {quiz.data ? <Badge tone={quiz.data.status}>{statusLabel[quiz.data.status]}</Badge> : null}

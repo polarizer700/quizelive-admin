@@ -10,7 +10,7 @@ export function LoginPage() {
 
   return (
     <AuthFrame title="Вход">
-      <LoginForm onSuccess={() => void navigate({ to: "/quizzes" })} />
+      <LoginForm onSuccess={() => void navigate({ to: "/dashboard" })} />
       <p className="mt-6 text-sm text-stone-600">
         Нет аккаунта?{" "}
         <Link to="/register" className="font-medium text-stone-950 underline">

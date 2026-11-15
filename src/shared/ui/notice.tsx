@@ -1,6 +1,6 @@
 export function Notice({ children }: { children: string }) {
   return (
-    <p className="rounded-2xl border border-rose-200/80 bg-rose-50/80 px-3 py-2 text-sm text-rose-800 backdrop-blur">
+    <p className="rounded-xl border-[3px] border-ink bg-pink/90 px-4 py-2.5 font-mono text-sm font-bold text-ink shadow-[4px_4px_0_#111]">
       {children}
     </p>
   );

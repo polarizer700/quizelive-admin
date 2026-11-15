@@ -123,8 +123,8 @@ export function UsersPage() {
           <StatusDonut
             slices={[
               { name: "Админы", value: stats.admins, color: "#1c1917" },
-              { name: "Редакторы", value: stats.editors, color: "#ea580c" },
-              { name: "Ведущие", value: stats.hosts, color: "#0ea5e9" },
+              { name: "Редакторы", value: stats.editors, color: "#2b4bff" },
+              { name: "Ведущие", value: stats.hosts, color: "#ff5da2" },
             ]}
             centerValue={items.length}
             centerLabel="на странице"

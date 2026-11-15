@@ -55,8 +55,8 @@ function GameView({ gameId }: { gameId: string }) {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
       <div>
-        <Link to="/games" className="text-sm text-stone-500 transition hover:text-stone-800">
-          ← К каталогу
+        <Link to="/quizzes" className="font-mono text-xs font-bold uppercase text-stone-500 transition hover:text-ink">
+          ← К витрине
         </Link>
         <div className="mt-3">
           <PageHeader

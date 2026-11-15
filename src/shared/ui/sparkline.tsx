@@ -2,7 +2,7 @@ import { Area, AreaChart, ResponsiveContainer } from "recharts";
 
 export function Sparkline({
   values,
-  color = "#ea580c",
+  color = "#2b4bff",
 }: {
   values: number[];
   color?: string;

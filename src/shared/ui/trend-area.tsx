@@ -35,12 +35,12 @@ export function TrendArea({
         <AreaChart data={data} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
           <defs>
             <linearGradient id="trendPrimary" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ea580c" stopOpacity={0.28} />
-              <stop offset="100%" stopColor="#ea580c" stopOpacity={0} />
+              <stop offset="0%" stopColor="#2b4bff" stopOpacity={0.28} />
+              <stop offset="100%" stopColor="#2b4bff" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="trendSecondary" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.22} />
-              <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0} />
+              <stop offset="0%" stopColor="#ff5da2" stopOpacity={0.22} />
+              <stop offset="100%" stopColor="#ff5da2" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid stroke="rgba(28,25,23,0.06)" vertical={false} />
@@ -69,7 +69,7 @@ export function TrendArea({
             type="monotone"
             dataKey="value"
             name={primaryLabel}
-            stroke="#ea580c"
+            stroke="#2b4bff"
             strokeWidth={2.5}
             fill="url(#trendPrimary)"
             isAnimationActive
@@ -80,7 +80,7 @@ export function TrendArea({
               type="monotone"
               dataKey="secondary"
               name={secondaryLabel}
-              stroke="#0ea5e9"
+              stroke="#ff5da2"
               strokeWidth={2}
               fill="url(#trendSecondary)"
               isAnimationActive
