@@ -11,10 +11,12 @@ export function AppShell() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const reduceMotion = useReducedMotion();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
-  useEffect(() => {
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setDrawerOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (!drawerOpen) return;

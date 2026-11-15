@@ -32,11 +32,13 @@ export function Header({ onMenuOpen }: { onMenuOpen: () => void }) {
   const context = pageContext(pathname);
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setMenuOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (!menuOpen) return;

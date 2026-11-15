@@ -66,7 +66,7 @@ export function UsersPage() {
   });
 
   const total = users.data?.total ?? 0;
-  const items = users.data?.items ?? [];
+  const items = useMemo(() => users.data?.items ?? [], [users.data]);
   const stats = useMemo(() => {
     const admins = items.filter((user) => user.role === "admin").length;
     const editors = items.filter((user) => user.role === "editor").length;
