@@ -53,9 +53,8 @@ function GameView({ gameId }: { gameId: string }) {
   }
 
   const own = Boolean(user && quiz.data && (user.id === quiz.data.owner_id || user.role === "admin"));
-  const canHost = Boolean(
-    quiz.data?.status === "published" && (user?.role === "admin" || user?.role === "host" || own),
-  );
+  // Сыграть можно в любую опубликованную игру; редактирование ограничено отдельно.
+  const canHost = quiz.data?.status === "published";
 
   return (
     <motion.div
