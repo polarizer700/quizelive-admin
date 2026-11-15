@@ -13,16 +13,24 @@ export type PublicGameList = components["schemas"]["PublicGameList"];
 
 export const publicGameKeys = {
   all: ["public-games"] as const,
-  list: (query: { limit: number; offset: number }) => [...publicGameKeys.all, "list", query] as const,
+  list: (query: PublicGameListQuery) => [...publicGameKeys.all, "list", query] as const,
 };
 
 export const quizKeys = {
   all: ["quizzes"] as const,
-  list: (query: { limit: number; offset: number }) => [...quizKeys.all, "list", query] as const,
+  list: (query: QuizListQuery) => [...quizKeys.all, "list", query] as const,
   detail: (quizId: string) => [...quizKeys.all, "detail", quizId] as const,
 };
 
-export function listQuizzes(query: { limit: number; offset: number; status?: QuizStatus }) {
+export type QuizListQuery = {
+  limit: number;
+  offset: number;
+  status?: QuizStatus | "";
+  game_type?: Quiz["game_type"] | "";
+  q?: string;
+};
+
+export function listQuizzes(query: QuizListQuery) {
   return call<QuizList>(() =>
     api.GET("/api/v1/quizzes", {
       params: {
@@ -30,16 +38,32 @@ export function listQuizzes(query: { limit: number; offset: number; status?: Qui
           limit: query.limit,
           offset: query.offset,
           ...(query.status ? { status: query.status } : {}),
+          ...(query.game_type ? { game_type: query.game_type } : {}),
+          ...(query.q ? { q: query.q } : {}),
         },
       },
     }),
   );
 }
 
-export function listPublicGames(query: { limit: number; offset: number }) {
+export type PublicGameListQuery = {
+  limit: number;
+  offset: number;
+  game_type?: PublicGame["game_type"] | "";
+  q?: string;
+};
+
+export function listPublicGames(query: PublicGameListQuery) {
   return call<PublicGameList>(() =>
     api.GET("/api/v1/games/public", {
-      params: { query: { limit: query.limit, offset: query.offset } },
+      params: {
+        query: {
+          limit: query.limit,
+          offset: query.offset,
+          ...(query.game_type ? { game_type: query.game_type } : {}),
+          ...(query.q ? { q: query.q } : {}),
+        },
+      },
     }),
   );
 }

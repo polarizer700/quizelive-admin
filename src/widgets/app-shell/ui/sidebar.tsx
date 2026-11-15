@@ -28,7 +28,18 @@ export function Sidebar({
   const linkClass = cn(navLinkBaseClass, collapsed && "w-11 justify-center px-0");
 
   return (
-    <div className={cn("flex h-full flex-col py-6", collapsed ? "items-center px-2" : "px-4", className)}>
+    <div className={cn("relative flex h-full flex-col py-6", collapsed ? "items-center px-2" : "px-4", className)}>
+      {onToggleCollapse ? (
+        <button
+          type="button"
+          onClick={onToggleCollapse}
+          aria-label={collapsed ? "Развернуть меню" : "Свернуть меню до иконок"}
+          title={collapsed ? "Развернуть меню" : "Свернуть меню до иконок"}
+          className={cn(toggleClass, "absolute right-3 top-3 z-10 size-9 shadow-[2px_2px_0_#111]")}
+        >
+          {collapsed ? <PanelLeftOpen size={15} /> : <PanelLeftClose size={15} />}
+        </button>
+      ) : null}
       <div className={cn("relative", collapsed ? "text-center" : "px-2")}>
         {collapsed ? (
           <p className="text-xl font-black uppercase leading-none tracking-tight text-ink" title="QuizeLive Студия">
@@ -86,17 +97,6 @@ export function Sidebar({
       </nav>
 
       <div className="relative mt-auto flex w-full flex-col items-center gap-3">
-        {onToggleCollapse ? (
-          <button
-            type="button"
-            onClick={onToggleCollapse}
-            aria-label={collapsed ? "Развернуть меню" : "Свернуть меню до иконок"}
-            title={collapsed ? "Развернуть меню" : "Свернуть меню до иконок"}
-            className={toggleClass}
-          >
-            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          </button>
-        ) : null}
         {collapsed ? (
           <div
             className="grid size-10 place-items-center rounded-xl border-[3px] border-ink bg-acid text-ink"

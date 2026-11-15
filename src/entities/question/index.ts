@@ -2,6 +2,7 @@ export {
   createQuestion,
   deleteQuestion,
   deleteQuestionImage,
+  listCategories,
   listQuestions,
   questionKeys,
   reorderQuestions,

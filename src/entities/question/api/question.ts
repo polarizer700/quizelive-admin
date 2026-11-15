@@ -9,7 +9,23 @@ export type QuestionType = components["schemas"]["QuestionType"];
 
 export const questionKeys = {
   list: (quizId: string) => ["questions", quizId] as const,
+  categories: ["question-categories"] as const,
 };
+
+export type CategoryList = components["schemas"]["CategoryList"];
+
+export function listCategories(q = "", limit = 50) {
+  return call<CategoryList>(() =>
+    api.GET("/api/v1/categories", {
+      params: {
+        query: {
+          ...(q ? { q } : {}),
+          limit,
+        },
+      },
+    }),
+  ).then((list) => list.items);
+}
 
 export function listQuestions(quizId: string) {
   return call<Question[]>(() =>

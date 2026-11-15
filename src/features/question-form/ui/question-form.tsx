@@ -3,12 +3,16 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import type { Question, QuestionInput } from "@entities/question";
+import { listCategories } from "@entities/question";
 import { questionTypeLabel } from "@entities/session";
 import { ApiError } from "@shared/api";
-import { Button, FieldError, Input, Label, Notice, Select, Textarea } from "@shared/ui";
+import { ApiSelect, Button, FieldError, Input, Label, Notice, Select, Textarea } from "@shared/ui";
 
 import { emptyQuestion, questionSchema, type QuestionValues } from "../model/schema";
 import { ImageDropzone } from "./image-dropzone";
+
+// Стабильная ссылка — используется в deps ApiSelect
+const loadCategoryOptions = (query: string) => listCategories(query);
 
 function toValues(question: Question): QuestionValues {
   return {
@@ -201,7 +205,13 @@ export function QuestionForm({
         <Label htmlFor="question-category">
           Категория <span className="font-normal text-stone-400">(необязательно, для квиза и своей игры — раунд)</span>
         </Label>
-        <Input id="question-category" placeholder="Например: Блиц" {...form.register("category")} />
+        <ApiSelect
+          id="question-category"
+          placeholder="Например: Блиц"
+          value={form.watch("category")}
+          loadOptions={loadCategoryOptions}
+          onChange={(next) => form.setValue("category", next, { shouldDirty: true })}
+        />
         <FieldError>{form.formState.errors.category?.message}</FieldError>
       </div>
       <div className="grid grid-cols-2 gap-3">

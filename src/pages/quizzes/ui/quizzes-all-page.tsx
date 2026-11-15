@@ -5,24 +5,39 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { gameTypeLabel, useSessionStore } from "@entities/session";
-import { issueHostToken, listPublicGames, publicGameKeys } from "@entities/quiz";
+import { issueHostToken, listPublicGames, publicGameKeys, type PublicGame } from "@entities/quiz";
 import { ApiError, errorMessage } from "@shared/api";
 import { tvDeepLink } from "@shared/config/play";
 import { formatDateTime } from "@shared/lib/format";
-import { Badge, Button, Notice, Panel } from "@shared/ui";
+import { Badge, Button, Notice } from "@shared/ui";
+
+import { emptyQuizFilters, useDebouncedValue, type QuizFiltersValue } from "../model/filters";
+import { QuizFilters } from "./quiz-filters";
 
 const limit = 20;
 
 export function QuizzesAllPage() {
   const user = useSessionStore((state) => state.user);
   const [offset, setOffset] = useState(0);
+  const [filters, setFilters] = useState<QuizFiltersValue>(emptyQuizFilters);
   const [copiedId, setCopiedId] = useState("");
   const [pendingId, setPendingId] = useState("");
   const [actionError, setActionError] = useState("");
 
+  const search = useDebouncedValue(filters.q.trim());
+  const gameType = (filters.game_type || undefined) as PublicGame["game_type"] | undefined;
+
+  // При смене фильтров возвращаемся на первую страницу (подстройка при рендере, без эффекта)
+  const filterKey = `${search}${gameType ?? ""}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (prevFilterKey !== filterKey) {
+    setPrevFilterKey(filterKey);
+    setOffset(0);
+  }
+
   const publicGames = useQuery({
-    queryKey: publicGameKeys.list({ limit, offset }),
-    queryFn: () => listPublicGames({ limit, offset }),
+    queryKey: publicGameKeys.list({ limit, offset, game_type: gameType ?? "", q: search }),
+    queryFn: () => listPublicGames({ limit, offset, game_type: gameType, q: search }),
   });
 
   // Ссылка ведёт на сам экран игры в play-приложении (/tv), а не на карточку в студии.
@@ -54,7 +69,9 @@ export function QuizzesAllPage() {
         <Notice>{errorMessage(publicGames.error, "Не удалось загрузить каталог")}</Notice>
       ) : null}
 
-      <Panel title="Все опубликованные" delay={120}>
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-sm font-bold uppercase tracking-[0.14em] text-ink">Все опубликованные</h2>
+        <QuizFilters value={filters} onChange={setFilters} />
         {publicGames.isLoading ? <p className="text-sm text-stone-500">Загрузка…</p> : null}
         {publicGames.data ? (
           <PublicGameTable
@@ -66,7 +83,7 @@ export function QuizzesAllPage() {
             onCopy={(gameId) => void copyGameLink(gameId)}
           />
         ) : null}
-      </Panel>
+      </section>
 
       {total > limit ? (
         <div className="flex items-center justify-between text-sm text-stone-600">

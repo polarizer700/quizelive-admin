@@ -182,6 +182,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listCategories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quizzes/{quizId}": {
         parameters: {
             query?: never;
@@ -289,6 +305,9 @@ export interface components {
         UserRole: "admin" | "editor" | "host";
         /** @enum {string} */
         QuizStatus: "draft" | "published";
+        CategoryList: {
+            items: string[];
+        };
         /** @enum {string} */
         QuestionType: "single" | "multiple" | "text";
         User: {
@@ -803,6 +822,9 @@ export interface operations {
                 limit?: components["parameters"]["Limit"];
                 offset?: components["parameters"]["Offset"];
                 status?: components["schemas"]["QuizStatus"];
+                game_type?: components["schemas"]["QuizGameType"];
+                /** @description Поиск по названию и описанию */
+                q?: string;
             };
             header?: never;
             path?: never;
@@ -854,6 +876,9 @@ export interface operations {
             query?: {
                 limit?: components["parameters"]["Limit"];
                 offset?: components["parameters"]["Offset"];
+                game_type?: components["schemas"]["QuizGameType"];
+                /** @description Поиск по названию и описанию */
+                q?: string;
             };
             header?: never;
             path?: never;
@@ -868,6 +893,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicGameList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listCategories: {
+        parameters: {
+            query?: {
+                /** @description Поиск по категориям */
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Уникальные категории вопросов */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryList"];
                 };
             };
             401: components["responses"]["Unauthorized"];

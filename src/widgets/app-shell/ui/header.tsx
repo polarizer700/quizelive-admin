@@ -66,7 +66,7 @@ export function Header({ onMenuOpen }: { onMenuOpen: () => void }) {
 
   return (
     <motion.header
-      className="glass-panel sticky top-4 z-30 mb-6 flex items-center gap-3 rounded-2xl px-4 py-3 md:px-5"
+      className="glass-panel sticky top-0 z-30 mb-6 flex items-center gap-3 rounded-2xl px-4 py-3 md:px-5"
       initial={reduceMotion ? false : { opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
