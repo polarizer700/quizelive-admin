@@ -1,52 +1,41 @@
-import { gameTypeLabel, statusLabel } from "@entities/session";
-import { Input, Select } from "@shared/ui";
+import { useState } from "react";
 
-import type { QuizFiltersValue } from "../model/filters";
+import { FilterBar, FilterDrawer } from "@shared/ui";
 
-export function QuizFilters({
-  value,
-  onChange,
-  withStatus = false,
-}: {
-  value: QuizFiltersValue;
-  onChange: (next: QuizFiltersValue) => void;
-  withStatus?: boolean;
-}) {
+import type { useQuizFilters } from "../model/filters";
+
+export function QuizFilters({ filters }: { filters: ReturnType<typeof useQuizFilters> }) {
+  const [open, setOpen] = useState(false);
+  const [initialKey, setInitialKey] = useState<string | null>(null);
+
+  function openDrawer(key: string | null) {
+    setInitialKey(key);
+    setOpen(true);
+  }
+
   return (
-    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
-      <Input
-        type="search"
-        value={value.q}
-        placeholder="Поиск по названию или описанию"
-        aria-label="Поиск игр"
-        onChange={(event) => onChange({ ...value, q: event.target.value })}
+    <>
+      <FilterBar
+        search={filters.q}
+        searchPlaceholder="Поиск по названию или описанию"
+        searchLabel="Поиск игр"
+        defs={filters.defs}
+        values={filters.values}
+        onSearchChange={filters.setQ}
+        onAddClick={() => openDrawer(null)}
+        onChipClick={openDrawer}
+        onChipRemove={filters.clearValues}
       />
-      {withStatus ? (
-        <Select
-          value={value.status}
-          aria-label="Фильтр по статусу"
-          onChange={(event) => onChange({ ...value, status: event.target.value })}
-        >
-          <option value="">Все статусы</option>
-          {Object.entries(statusLabel).map(([status, label]) => (
-            <option key={status} value={status}>
-              {label}
-            </option>
-          ))}
-        </Select>
-      ) : null}
-      <Select
-        value={value.game_type}
-        aria-label="Фильтр по типу игры"
-        onChange={(event) => onChange({ ...value, game_type: event.target.value })}
-      >
-        <option value="">Все типы игр</option>
-        {Object.entries(gameTypeLabel).map(([type, label]) => (
-          <option key={type} value={type}>
-            {label}
-          </option>
-        ))}
-      </Select>
-    </div>
+      <FilterDrawer
+        open={open}
+        defs={filters.defs}
+        values={filters.values}
+        initialKey={initialKey}
+        onToggle={filters.toggleValue}
+        onClear={filters.clearValues}
+        onClearAll={filters.clearAll}
+        onClose={() => setOpen(false)}
+      />
+    </>
   );
 }

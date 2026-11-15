@@ -821,8 +821,12 @@ export interface operations {
             query?: {
                 limit?: components["parameters"]["Limit"];
                 offset?: components["parameters"]["Offset"];
-                status?: components["schemas"]["QuizStatus"];
-                game_type?: components["schemas"]["QuizGameType"];
+                /** @description Фильтр по статусам (несколько значений через запятую — ИЛИ) */
+                status?: components["schemas"]["QuizStatus"][];
+                /** @description Фильтр по типам игры (несколько значений через запятую — ИЛИ) */
+                game_type?: components["schemas"]["QuizGameType"][];
+                /** @description Фильтр по категориям вопросов внутри игры (несколько значений через запятую — ИЛИ) */
+                category?: string[];
                 /** @description Поиск по названию и описанию */
                 q?: string;
             };
@@ -876,7 +880,10 @@ export interface operations {
             query?: {
                 limit?: components["parameters"]["Limit"];
                 offset?: components["parameters"]["Offset"];
-                game_type?: components["schemas"]["QuizGameType"];
+                /** @description Фильтр по типам игры (несколько значений через запятую — ИЛИ) */
+                game_type?: components["schemas"]["QuizGameType"][];
+                /** @description Фильтр по категориям вопросов внутри игры (несколько значений через запятую — ИЛИ) */
+                category?: string[];
                 /** @description Поиск по названию и описанию */
                 q?: string;
             };

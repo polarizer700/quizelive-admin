@@ -28,6 +28,9 @@ export function bindSession(next: SessionBridge) {
 export const api = createClient<paths>({
   baseUrl: "",
   credentials: "include",
+  // Массивы в query — через запятую (explode: false в openapi.yaml),
+  // иначе openapi-fetch шлёт повторяющиеся параметры
+  querySerializer: { array: { style: "form", explode: false } },
 });
 
 api.use({

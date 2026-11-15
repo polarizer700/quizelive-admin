@@ -2,6 +2,8 @@ export { ApiSelect } from "./api-select";
 export { Badge } from "./badge";
 export { Button } from "./button";
 export { FieldError, Input, Label, Select, Textarea } from "./field";
+export { FilterBar } from "./filter-bar";
+export { FilterDrawer } from "./filter-drawer";
 export { Notice } from "./notice";
 export { PageHeader } from "./page-header";
 export { Panel } from "./panel";

@@ -25,8 +25,9 @@ export const quizKeys = {
 export type QuizListQuery = {
   limit: number;
   offset: number;
-  status?: QuizStatus | "";
-  game_type?: Quiz["game_type"] | "";
+  status?: QuizStatus[];
+  game_type?: Quiz["game_type"][];
+  category?: string[];
   q?: string;
 };
 
@@ -37,8 +38,9 @@ export function listQuizzes(query: QuizListQuery) {
         query: {
           limit: query.limit,
           offset: query.offset,
-          ...(query.status ? { status: query.status } : {}),
-          ...(query.game_type ? { game_type: query.game_type } : {}),
+          ...(query.status?.length ? { status: query.status } : {}),
+          ...(query.game_type?.length ? { game_type: query.game_type } : {}),
+          ...(query.category?.length ? { category: query.category } : {}),
           ...(query.q ? { q: query.q } : {}),
         },
       },
@@ -49,7 +51,8 @@ export function listQuizzes(query: QuizListQuery) {
 export type PublicGameListQuery = {
   limit: number;
   offset: number;
-  game_type?: PublicGame["game_type"] | "";
+  game_type?: PublicGame["game_type"][];
+  category?: string[];
   q?: string;
 };
 
@@ -60,7 +63,8 @@ export function listPublicGames(query: PublicGameListQuery) {
         query: {
           limit: query.limit,
           offset: query.offset,
-          ...(query.game_type ? { game_type: query.game_type } : {}),
+          ...(query.game_type?.length ? { game_type: query.game_type } : {}),
+          ...(query.category?.length ? { category: query.category } : {}),
           ...(query.q ? { q: query.q } : {}),
         },
       },
